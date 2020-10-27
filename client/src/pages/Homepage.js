@@ -57,7 +57,7 @@ const Homepage = () => {
 
             setDisplayedMovie(filteredMovies[0]);
         }
-    }, [movies])
+    }, [movies, state.savedMovies, state.removedMovies])
 
     // get the movies from The Movie Database endpoints
     useEffect(() => {
@@ -177,9 +177,7 @@ const Homepage = () => {
         if (movies.length > 1) {
             const updatedMovies = await movies.slice(1);
             updatedMovies.push(displayedMovie);
-            console.log({ updatedMovies });
-            setDisplayedMovie(updatedMovies[0]);
-            setMovies(updatedMovies);
+            setMovies(updatedMovies); // this isn't working
         } else {
             console.log('no more movies!');
         }
