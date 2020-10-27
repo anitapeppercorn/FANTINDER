@@ -21,21 +21,7 @@ const SearchMovies = () => {
             return false;
         }
 
-        try {
-            const response = await searchTMDB(searchInput);
-            
-            if (!response.ok) {
-                throw new Error('Something went wrong with the search!');
-            }
-
-            const { results } = await response.json();
-
-            const movieData = await cleanMovieData(results);
-
-            setSearchedMovies(movieData);
-        } catch (err) {
-            console.error(err);
-        }
+        searchTMDB(searchInput, setSearchedMovies);
     };
 
     return (
