@@ -119,6 +119,7 @@ const resolvers = {
                 const updatedUser = await User.findByIdAndUpdate(
                     { _id: context.user._id },
                     { $addToSet: { savedMovies: input } },
+                    { $pull: { removeMovie: { movieId: input.movieId } } },
                     { new: true }
                 );
                 return updatedUser;
@@ -130,6 +131,7 @@ const resolvers = {
             if (context.user) {
                 const updatedUser = await User.findOneAndUpdate(
                     { _id: context.user._id },
+                    { $addToSet: { removeMovie: args.movieId } },
                     { $pull: { savedMovies: { movieId: args.movieId } } },
                     { new: true }
                 );
