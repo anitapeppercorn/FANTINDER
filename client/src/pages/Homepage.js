@@ -10,7 +10,13 @@ import { useMutation, useQuery } from '@apollo/react-hooks';
 
 // import GlobalState dependencies
 import { useFantinderContext } from "../utils/GlobalState";
-import { ADD_TO_REMOVED_MOVIES, ADD_TO_SAVED_MOVIES, UPDATE_REMOVED_MOVIES, UPDATE_SAVED_MOVIES } from '../utils/actions';
+import { 
+    ADD_TO_REMOVED_MOVIES,
+    ADD_TO_SAVED_MOVIES,
+    UPDATE_MOVIES_TO_DISPLAY,
+    UPDATE_REMOVED_MOVIES,
+    UPDATE_SAVED_MOVIES }
+from '../utils/actions';
 
 // import components
 import { Container, Jumbotron } from 'react-bootstrap';
@@ -30,21 +36,32 @@ const Homepage = () => {
 
     useEffect(() => {
         if (!movies[0]) {
-            // start with trending movies
+            // get the trending movies
             getTrendingMovies('day', setMovies);
         } else {
             const filteredMovies = movies.filter(movie => {
-               const isSaved = state.savedMovies?.some(savedMovie => savedMovie.movieId === movie.movieId);
-               const isRemoved = state.removedMovies?.some(removedMovieId => removedMovieId === movie.movieId);
-
-               return !isSaved && !isRemoved
+                const isSaved = state.savedMovies.some(savedMovie => savedMovie.movieId === movie.movieId);
+                const isRemoved = state.removedMovies.some(removedMovieId => removedMovieId === movie.movieId);
+ 
+                return !isSaved && !isRemoved
             })
+
+            dispatch({
+                type: UPDATE_MOVIES_TO_DISPLAY,
+                moviesToDisplay: filteredMovies
+            })
+            
+            filteredMovies.forEach((movie) => {
+                idbPromise('moviesToDisplay', 'put', movie);
+            });
+
             setDisplayedMovie(filteredMovies[0]);
         }
-    })
+    }, [movies])
+
     // get the movies from The Movie Database endpoints
     useEffect(() => {
-        if(data) {
+        if (data) {
             dispatch({
                 type: UPDATE_REMOVED_MOVIES,
                 removedMovies: data.me.removedMovies
@@ -77,6 +94,13 @@ const Homepage = () => {
                     savedMovies: savedMovies
                 });
             })
+
+            idbPromise('moviesTodisplay', 'get').then((moviesToDisplay) => {
+                dispatch({
+                    type: UPDATE_MOVIES_TO_DISPLAY,
+                    moviesToDisplay: moviesToDisplay
+                });
+            })  
         }
     }, [data, loading, dispatch]);
 
@@ -98,6 +122,7 @@ const Homepage = () => {
             });
 
             idbPromise('savedMovies', 'put', movie);
+            idbPromise('moviesToDisplay', 'delete', movie);
             idbPromise('removedMovies', 'delete', { movieId: movie.movieId });
 
             // update the movies to display
@@ -114,7 +139,6 @@ const Homepage = () => {
     };
 
     const handleRemoveMovie = async (movie) => {
-        console.log({ movieId:movie.movieId });
         try {
             // update the db
             const { data } = await removeMovie({
@@ -132,6 +156,7 @@ const Homepage = () => {
             });
 
             idbPromise('savedMovies', 'delete', { ...movie });
+            idbPromise('moviesToDisplay', 'delete', { ...movie });
             idbPromise('removedMovies', 'put', { movieId: movie.movieId });
 
             // update the movies to display
@@ -147,23 +172,44 @@ const Homepage = () => {
         }
     };
 
+    const handleSkipMovie = async ( ) => {
+        // update the movies to display
+        if (movies.length > 1) {
+            const updatedMovies = await movies.slice(1);
+            updatedMovies.push(displayedMovie);
+            console.log({ updatedMovies });
+            setDisplayedMovie(updatedMovies[0]);
+            setMovies(updatedMovies);
+        } else {
+            console.log('no more movies!');
+        }
+    };
+
     return(
         <>
             <Jumbotron fluid className="text-light">
                 <Container>
-                    <h1>Discover new movies!</h1>
+                    <h1>Discover new movies below!</h1>
+                    <ul>
+                        <li>Click the thumbs up icon to save a movie and the thumbs down icon to indicate disinterest.</li>
+                        <li>Click the right arrow to skip ahead.</li>
+                        <li>If a trailer is available, you'll see it on the card!</li>
+                    </ul>
                 </Container>
             </Jumbotron>
 
-            <Container>
-                {displayedMovie && 
-                    <SingleMovieCard
-                        displayTrailer 
+            <Container className="home-movie-container">
+                {displayedMovie
+                    ? <SingleMovieCard
+                        displayTrailer
+                        displaySkipButton
                         movie={displayedMovie}
                         saveMovieHandler={handleSaveMovie}
+                        skipMovieHandler={handleSkipMovie}
                         removeMovieHandler={handleRemoveMovie}
                         disabled={state.savedMovies?.some((savedMovie) => savedMovie.movieId === displayedMovie.movieId)}
                         btnColor={state.savedMovies?.some((savedMovie) => savedMovie.movieId === displayedMovie.movieId) ? "outline-secondary" : "outline-success" } />
+                    : <h2>No more movies to display! Check back tomorrow.</h2>
                 }
             </Container>
         </>

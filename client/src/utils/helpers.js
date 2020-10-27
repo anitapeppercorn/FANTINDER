@@ -13,6 +13,7 @@ export function idbPromise(storeName, method, object) {
       // create object store for each type of data and set "primary" key index to be the `_id` of the data
       db.createObjectStore('removedMovies', { keyPath: 'movieId' });
       db.createObjectStore('savedMovies', { keyPath: 'movieId' });
+      db.createObjectStore('moviesToDisplay', { keyPath: 'movieId' });
     };
 
     // handle any errors with connecting
