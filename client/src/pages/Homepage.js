@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 // import TMDB API dependencies
-import { getMovies, getTrendingMovies } from '../utils/API';
+import { getTrendingMovies } from '../utils/API';
 
 // import GraphQL Dependencies
 import { SAVE_MOVIE, REMOVE_MOVIE } from '../utils/mutations';
@@ -10,7 +10,7 @@ import { useMutation, useQuery } from '@apollo/react-hooks';
 
 // import GlobalState dependencies
 import { useFantinderContext } from "../utils/GlobalState";
-import { UPDATE_SAVED_MOVIES } from '../utils/actions';
+import { ADD_TO_REMOVED_MOVIES, ADD_TO_SAVED_MOVIES, UPDATE_REMOVED_MOVIES, UPDATE_SAVED_MOVIES } from '../utils/actions';
 
 // import components
 import { Container, Jumbotron } from 'react-bootstrap';
@@ -34,7 +34,10 @@ const Homepage = () => {
             getTrendingMovies('day', setMovies);
         } else {
             const filteredMovies = movies.filter(movie => {
-               return !state.savedMovies?.some(savedMovie => savedMovie.movieId === movie.movieId);
+               const isSaved = state.savedMovies?.some(savedMovie => savedMovie.movieId === movie.movieId);
+               const isRemoved = state.removedMovies?.some(removedMovieId => removedMovieId === movie.movieId);
+
+               return !isSaved && !isRemoved
             })
             setDisplayedMovie(filteredMovies[0]);
         }
@@ -43,23 +46,37 @@ const Homepage = () => {
     useEffect(() => {
         if(data) {
             dispatch({
+                type: UPDATE_REMOVED_MOVIES,
+                removedMovies: data.me.removedMovies
+            })
+
+            dispatch({
                 type: UPDATE_SAVED_MOVIES,
                 savedMovies: data.me.savedMovies
             })
+
+            data.me.removedMovies.forEach((movieId) => {
+                idbPromise('removedMovies', 'put', { movieId });
+            });
     
             data.me.savedMovies.forEach((movie) => {
                 idbPromise('savedMovies', 'put', movie);
             });
-        // add else if to check if `loading` is undefined in `useQuery()` Hook
+        // add else if to check if `loading` is undefined in `useQuery()` Hook (meaning we're offline)
         } else if (!loading) {
-            // since we're offline, get all of the data from the `savedMovies` store
+            idbPromise('removedMovies', 'get').then((removedMovies) => {
+                dispatch({
+                    type: UPDATE_REMOVED_MOVIES,
+                    removedMovies: removedMovies
+                });
+            });
+
             idbPromise('savedMovies', 'get').then((savedMovies) => {
-                // use retrieved data to set global state for offline browsing
                 dispatch({
                     type: UPDATE_SAVED_MOVIES,
                     savedMovies: savedMovies
                 });
-            });
+            })
         }
     }, [data, loading, dispatch]);
 
@@ -70,21 +87,18 @@ const Homepage = () => {
                 variables: { input: movie }
             });
 
-            // get savedMovies from the updated User
-            const { saveMovie: saveMovieData } = data;
-            const { savedMovies: updatedSavedMovies } = saveMovieData;
-
             if (saveError) {
                 throw new Error('Something went wrong!');
             }
 
             // update global state
             dispatch({
-                type: UPDATE_SAVED_MOVIES,
-                savedMovies: updatedSavedMovies
+                type: ADD_TO_SAVED_MOVIES,
+                movie: movie
             });
 
-            idbPromise('savedMovies', 'put', { ...movie });
+            idbPromise('savedMovies', 'put', movie);
+            idbPromise('removedMovies', 'delete', { movieId: movie.movieId });
 
             // update the movies to display
             if (movies.length > 1) {
@@ -100,15 +114,12 @@ const Homepage = () => {
     };
 
     const handleRemoveMovie = async (movie) => {
+        console.log({ movieId:movie.movieId });
         try {
             // update the db
             const { data } = await removeMovie({
                 variables: { movieId: movie.movieId }
             });
-
-            // get savedMovies from the updated User
-            const { removeMovie: saveMovieData } = data;
-            const { savedMovies: updatedSavedMovies } = saveMovieData;
 
             if (removeError) {
                 throw new Error('Something went wrong!');
@@ -116,11 +127,12 @@ const Homepage = () => {
 
             // update global state
             dispatch({
-                type: UPDATE_SAVED_MOVIES,
-                savedMovies: updatedSavedMovies
+                type: ADD_TO_REMOVED_MOVIES,
+                movie: movie
             });
 
             idbPromise('savedMovies', 'delete', { ...movie });
+            idbPromise('removedMovies', 'put', { movieId: movie.movieId });
 
             // update the movies to display
             if (movies.length > 1) {
