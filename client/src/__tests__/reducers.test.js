@@ -1,6 +1,7 @@
 // import our actions
 import {
-    UPDATE_REMOVED_MOVIES,
+    ADD_TO_REMOVED_MOVIES,
+    ADD_TO_SAVED_MOVIES,
     UPDATE_SAVED_MOVIES
 } from '../utils/actions';
 
@@ -34,9 +35,9 @@ const initialState = {
     removedMovies: [3, 4]
 };
 
-test('UPDATE_SAVED_MOVIES', () => {
+test('ADD_TO_SAVED_MOVIES', () => {
     let newState = reducer(initialState, {
-        type: UPDATE_SAVED_MOVIES,
+        type: ADD_TO_SAVED_MOVIES,
         movie: {
             "movieId": 3,  // new movieId
             "vote": 9.0,
@@ -60,9 +61,9 @@ test('UPDATE_SAVED_MOVIES', () => {
     expect(initialState.removedMovies.length).toBe(2);
 });
 
-test('UPDATE_REMOVED_MOVIES', () => {
+test('ADD_TO_REMOVED_MOVIES', () => {
     let newState = reducer(initialState, {
-        type: UPDATE_REMOVED_MOVIES,
+        type: ADD_TO_REMOVED_MOVIES,
         movie: {
             "movieId": 1,
             "vote": 9.0,
@@ -84,4 +85,26 @@ test('UPDATE_REMOVED_MOVIES', () => {
     expect(newState.removedMovies.length).toBe(3);
     expect(newState.removedMovies[2]).toBe(1);
     expect(initialState.removedMovies.length).toBe(2);
+});
+
+test('UPDATE_SAVED_MOVIES', () => {
+    let newState = reducer(initialState, {
+        type: UPDATE_SAVED_MOVIES,
+        savedMovies: [{
+            "movieId": 3,  // new movieId
+            "vote": 9.0,
+            "voteCount": 111,
+            "overview": "This is Grumpy Cat's movie",
+            "name": "Grumpy Cat",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/Grumpy_Cat_%2814556024763%29_%28cropped%29.jpg/220px-Grumpy_Cat_%2814556024763%29_%28cropped%29.jpg",
+            "release": "2020-10-10",
+            "trailer": "https://www.youtube.com/watch?v=INscMGmhmX4"
+        }]
+    });
+
+    // check saved movies
+    expect(newState.savedMovies.length).toBe(1);
+    expect(newState.savedMovies[0].movieId).toBe(3);
+    expect(initialState.savedMovies.length).toBe(2);
+    expect(initialState.savedMovies.length).toBe(2);
 });

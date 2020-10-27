@@ -1,23 +1,29 @@
 import { useReducer } from 'react';
 
 import {
-    UPDATE_REMOVED_MOVIES,
+    ADD_TO_REMOVED_MOVIES,
+    ADD_TO_SAVED_MOVIES,
     UPDATE_SAVED_MOVIES
 } from "./actions";
 
 export const reducer = (state, action) => {
     switch (action.type) {
-        case UPDATE_REMOVED_MOVIES:
+        case ADD_TO_REMOVED_MOVIES:
             return {
                 ...state,
-                savedMovies: state.savedMovies?.filter(movie => movie.movieId !== action.movie.movieId),
+                savedMovies: state.savedMovies.filter(savedMovie => savedMovie.movieId !== action.movie.movieId),
                 removedMovies: [...state.removedMovies, action.movie.movieId]
+            }
+        case ADD_TO_SAVED_MOVIES:
+            return {
+                ...state,
+                savedMovies: [...state.savedMovies, action.movie],
+                removedMovies: state.removedMovies.filter(removedMovieId => removedMovieId !== action.movie.movieId)
             }
         case UPDATE_SAVED_MOVIES:
             return {
                 ...state,
-                savedMovies: [...state.savedMovies, action.movie],
-                removedMovies: state.removedMovies?.filter(movieId => movieId !== action.movie.movieId)
+                savedMovies: action.savedMovies
             }
         default:
             return state ? state : '';

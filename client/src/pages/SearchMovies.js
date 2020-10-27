@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 
 // import TMDB API dependencies
 import { searchTMDB } from '../utils/API';
-import { cleanMovieData } from '../utils/movieData';
 
 // import react-bootstrap components
 import { Form, Button, Container, Jumbotron } from 'react-bootstrap';
