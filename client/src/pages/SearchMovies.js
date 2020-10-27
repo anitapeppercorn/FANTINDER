@@ -10,6 +10,9 @@ import { Form, Button, Container, Jumbotron } from 'react-bootstrap';
 // import custom components
 import MovieCards from '../components/MovieCards'
 
+// import custom component for carousel
+import ControlledCarousel from '../components/Carousel'
+
 const SearchMovies = () => {
     const [searchInput, setSearchInput] = useState('');
     const [searchedMovies, setSearchedMovies] = useState([]);
@@ -50,7 +53,7 @@ const SearchMovies = () => {
                                 value={searchInput}
                                 onChange={(e) => setSearchInput(e.target.value)}
                                 type='text'
-                                placeholder='The Lord of the Rings'
+                                placeholder='example: The Lord of the Rings'
                             />
                             <Button type='submit' className='ml-2'>
                                 Search
@@ -65,6 +68,7 @@ const SearchMovies = () => {
                     {searchedMovies.length > 0 && `Viewing ${searchedMovies.length} results:`}
                 </h2>
                 <MovieCards displayTrailers='true' moviesToDisplay={searchedMovies} />
+                <ControlledCarousel />
             </Container>
         </>
     );

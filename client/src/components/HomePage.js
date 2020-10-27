@@ -21,6 +21,7 @@ class Homepage extends Component {
         })
     }
 
+
     render() {
 
         return (
@@ -38,7 +39,7 @@ class Homepage extends Component {
                                     onChange={(e) => this.setSearchInput(e.target.value)}
                                     type='text'
                                     size='lg'
-                                    placeholder='The Lord of the Rings'
+                                    placeholder='example: The Lord of the Rings'
                                 />
                             </InputGroup>
 
