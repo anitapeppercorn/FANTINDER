@@ -2,6 +2,7 @@
 import {
     ADD_TO_REMOVED_MOVIES,
     ADD_TO_SAVED_MOVIES,
+    UPDATE_REMOVED_MOVIES,
     UPDATE_SAVED_MOVIES
 } from '../utils/actions';
 
@@ -35,32 +36,6 @@ const initialState = {
     removedMovies: [3, 4]
 };
 
-test('ADD_TO_SAVED_MOVIES', () => {
-    let newState = reducer(initialState, {
-        type: ADD_TO_SAVED_MOVIES,
-        movie: {
-            "movieId": 3,  // new movieId
-            "vote": 9.0,
-            "voteCount": 111,
-            "overview": "This is Grumpy Cat's movie",
-            "name": "Grumpy Cat",
-            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/Grumpy_Cat_%2814556024763%29_%28cropped%29.jpg/220px-Grumpy_Cat_%2814556024763%29_%28cropped%29.jpg",
-            "release": "2020-10-10",
-            "trailer": "https://www.youtube.com/watch?v=INscMGmhmX4"
-        }
-    });
-
-    // check saved movies
-    expect(newState.savedMovies.length).toBe(3);
-    expect(newState.savedMovies[2].movieId).toBe(3);
-    expect(initialState.savedMovies.length).toBe(2);
-
-    // check removed movies
-    expect(newState.removedMovies.length).toBe(1);
-    expect(newState.removedMovies[0]).toBe(4);
-    expect(initialState.removedMovies.length).toBe(2);
-});
-
 test('ADD_TO_REMOVED_MOVIES', () => {
     let newState = reducer(initialState, {
         type: ADD_TO_REMOVED_MOVIES,
@@ -87,6 +62,32 @@ test('ADD_TO_REMOVED_MOVIES', () => {
     expect(initialState.removedMovies.length).toBe(2);
 });
 
+test('ADD_TO_SAVED_MOVIES', () => {
+    let newState = reducer(initialState, {
+        type: ADD_TO_SAVED_MOVIES,
+        movie: {
+            "movieId": 3,  // new movieId
+            "vote": 9.0,
+            "voteCount": 111,
+            "overview": "This is Grumpy Cat's movie",
+            "name": "Grumpy Cat",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/Grumpy_Cat_%2814556024763%29_%28cropped%29.jpg/220px-Grumpy_Cat_%2814556024763%29_%28cropped%29.jpg",
+            "release": "2020-10-10",
+            "trailer": "https://www.youtube.com/watch?v=INscMGmhmX4"
+        }
+    });
+
+    // check saved movies
+    expect(newState.savedMovies.length).toBe(3);
+    expect(newState.savedMovies[2].movieId).toBe(3);
+    expect(initialState.savedMovies.length).toBe(2);
+
+    // check removed movies
+    expect(newState.removedMovies.length).toBe(1);
+    expect(newState.removedMovies[0]).toBe(4);
+    expect(initialState.removedMovies.length).toBe(2);
+});
+
 test('UPDATE_SAVED_MOVIES', () => {
     let newState = reducer(initialState, {
         type: UPDATE_SAVED_MOVIES,
@@ -107,4 +108,27 @@ test('UPDATE_SAVED_MOVIES', () => {
     expect(newState.savedMovies[0].movieId).toBe(3);
     expect(initialState.savedMovies.length).toBe(2);
     expect(initialState.savedMovies.length).toBe(2);
+});
+
+
+test('UPDATE_REMOVED_MOVIES', () => {
+    let newState = reducer(initialState, {
+        type: UPDATE_REMOVED_MOVIES,
+        removedMovies: [{
+            "movieId": 3,  // new movieId
+            "vote": 9.0,
+            "voteCount": 111,
+            "overview": "This is Grumpy Cat's movie",
+            "name": "Grumpy Cat",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/Grumpy_Cat_%2814556024763%29_%28cropped%29.jpg/220px-Grumpy_Cat_%2814556024763%29_%28cropped%29.jpg",
+            "release": "2020-10-10",
+            "trailer": "https://www.youtube.com/watch?v=INscMGmhmX4"
+        }]
+    });
+
+    // check saved movies
+    expect(newState.removedMovies.length).toBe(1);
+    expect(newState.removedMovies[0].movieId).toBe(3);
+    expect(initialState.removedMovies.length).toBe(2);
+    expect(initialState.removedMovies.length).toBe(2);
 });
