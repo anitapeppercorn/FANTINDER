@@ -26,13 +26,11 @@ export const getVideos = (movie_id) => {
 // time_window can be by day or week
 export const getTrendingMovies = (time_window, updateState) => {
     const trendingMoviesURL = `https://api.themoviedb.org/3/trending/movie/${time_window}?api_key=d64da0474db9594724886e71c0d202f1`;
-    console.log(trendingMoviesURL);
     fetch(trendingMoviesURL).then(function(res) {
         if (res.ok) {
             res.json().then(async function(data) {
                 const { results } = data;
                 const cleanedData = await cleanMovieData(results);
-                console.log({cleanedData});
                 updateState(cleanedData);
             })
         } else {

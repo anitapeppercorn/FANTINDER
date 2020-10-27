@@ -50,7 +50,7 @@ const SearchMovies = () => {
                 <h2 className="results-heading">
                     {searchedMovies.length > 0 && `Viewing ${searchedMovies.length} results:`}
                 </h2>
-                <MovieCards displayTrailers='true' moviesToDisplay={searchedMovies} />
+                <MovieCards displayTrailers moviesToDisplay={searchedMovies} />
             </Container>
         </>
     );
