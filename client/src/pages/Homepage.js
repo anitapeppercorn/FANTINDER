@@ -28,32 +28,8 @@ const Homepage = () => {
             </Jumbotron>
 
             <Container>
-                <h2 className="results-heading">
-                    Today's Trending Movies
-                </h2>
                 <MovieCards displayTrailers='true' moviesToDisplay={trendingMovies} />
             </Container>
-
-            {/* <Container>
-                <h2 className="results-heading">
-                    Top Rated
-                </h2>
-                <MovieCards displayTrailers='true' moviesToDisplay={topRatedMovies} />
-            </Container> */}
-
-            {/* <Container>
-                <h2 className="results-heading">
-                    Newly Added
-                </h2>
-                <MovieCards displayTrailers='true' moviesToDisplay={latestMovies} />
-            </Container> */}
-
-            {/* <Container>
-                <h2 className="results-heading">
-                    Most Popular
-                </h2>
-                <MovieCards displayTrailers='true' moviesToDisplay={popularMovies} />
-            </Container> */}
         </>
     );
 }
