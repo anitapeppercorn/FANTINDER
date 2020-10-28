@@ -37,6 +37,7 @@ export function idbPromise(storeName, method, object) {
 
       switch (method) {
         case 'put':
+          console.log("put objec", object)
           store.put(object);
           resolve(object);
           break;

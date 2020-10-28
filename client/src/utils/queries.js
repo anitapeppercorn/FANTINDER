@@ -25,7 +25,9 @@ export const GET_USER = gql`
         username
         email
         movieCount
-        removedMovies
+        removedMovies {
+          movieId
+        }
         savedMovies {
               movieId
               name

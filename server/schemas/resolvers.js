@@ -135,11 +135,18 @@ const resolvers = {
         },
 
         removeMovie: async (parent, { movieId }, context) => {
+            console.log("Attempting to remove movie", movieId)
+            console.log("context", context.user)
             if (context.user) {
+                console.log("Attempting to remove movie in conext.user", movieId)
+                const user = await User.findOne({_id: context.user._id});
+                let savedMovies = user.savedMovies; 
+                let toRemove = savedMovies.filter(sm => sm.movieId == movieId)[0];
+
                 const updatedUser = await User.findOneAndUpdate(
                     { _id: context.user._id },
                     {
-                        $addToSet: { removedMovies: movieId },
+                        $addToSet: { removedMovies: toRemove },
                         $pull: { savedMovies: { movieId } } 
                     },
                     { new: true }

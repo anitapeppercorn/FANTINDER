@@ -72,8 +72,9 @@ const Homepage = () => {
                 savedMovies: data.me.savedMovies
             })
 
-            data.me.removedMovies.forEach((movieId) => {
-                idbPromise('removedMovies', 'put', { movieId });
+            data.me.removedMovies.forEach((movie) => {
+                console.log("movieeeee", movie)
+                idbPromise('removedMovies', 'put', { movieId: movie.movieId });
             });
     
             data.me.savedMovies.forEach((movie) => {

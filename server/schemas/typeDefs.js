@@ -2,7 +2,7 @@ const { gql } = require('apollo-server-express');
 
 const typeDefs = gql`
     type Movie {
-        movieId: String
+        movieId: Int
         vote: Float
         voteCount: Int
         overview: String
@@ -65,7 +65,7 @@ const typeDefs = gql`
         addReaction(commentId: ID!, reactionBody: String!): Comment
         addFriend(friendId: ID!): User
         saveMovie(input: movieInput): User
-        removeMovie(input: movieInput): User
+        removeMovie(movieId: Int!): User
     }
 `;
 

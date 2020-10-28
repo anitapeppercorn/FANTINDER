@@ -49,6 +49,7 @@ const MovieCards = (props) => {
     }, [data, loading, dispatch]);
 
     const handleSaveMovie = async (movie) => {
+        console.log("Movie", movie)
         try {
             // update the db
             const { data } = await saveMovie({
@@ -76,6 +77,7 @@ const MovieCards = (props) => {
     };
 
     const handleRemoveMovie = async (movie) => {
+        console.log("removing movie: ", movie)
         try {
             // update the db
             const { data } = await removeMovie({
