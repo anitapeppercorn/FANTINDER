@@ -27,7 +27,7 @@ Project Requirements were to to create a MERN stack single-page application that
 
 ## Contents
 - [Description](#Description)
-- [App Screenshot](#App)
+- [App Screenshot](#App-Screenshot)
 - [User Story](#User-Story)
 - [Acceptance Criteria](#Acceptance-Criteria)
 - [Concepts](#Concepts)
@@ -143,7 +143,8 @@ In this project we used the following packages:
 [MIT License](./LICENSE)
 ![license](https://img.shields.io/badge/License-MIT-blue)
 
-## Author: Vanessa Lane, Anita Ganti, Priya Ravi
+## Author
+### Vanessa Lane, Anita Ganti, Priya Ravi
 
 View the authors' portfolio at:  
 - https://anitapeppercorn.github.io/react-portfolio/
@@ -160,7 +161,7 @@ View the authors' portfolio at:
 ![Badge](https://img.shields.io/badge/Github-vanessalane-4cbbb9) 
 
 
-[Table of Content](#Table-of-Content) --- [Back to Top](#FANTINDER)
+[Table of Contents](#Contents) --- [Back to Top](#FANTINDER)
 
 
 
