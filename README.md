@@ -13,18 +13,18 @@ https://fantinder.herokuapp.com/
 
 We built a full stack - MERN Stack media streaming site with Stripe for Payments, and deployed it to Heroku at https://fantinder.herokuapp.com/ This project has played a key role in our journey to becoming a full-stack web developers. It showcases collaborative skills and coding abilities, especially in the context of a scalable, user-focused MERN app.
 Project Requirements were to to create a MERN stack single-page application that works with real-world data to solve a real-world challenge, with a focus on user demand:
-Using React for the front end.
-Using GraphQL with a Node.js and Express.js server.
-Using MongoDB and the Mongoose ODM for the database.
-Using queries and mutations for retrieving, adding, updating, and deleting data.
-Deployed using Heroku (with data).
-Meets the minimum requirements of a PWA: Uses a web manifest, Uses a service worker for offline functionality, Is installable
-Offering a polished UI, is responsive and is interactive 
-Including authentication (JWT) and protects sensitive API key information on the server.
-The project has a clean repository that meets quality coding standards (file structure, naming conventions, best practices for class and id naming conventions, indentation, quality comments, etc.) and a high-quality README (with unique name, description, technologies used, screenshot, and link to deployed application).
-This project is part of our REACT portfolio 
-Improved CSS Styling and using a component library
-Integrates a Payment Platform integrating the Stripe payment .
+- Using React for the front end.
+- Using GraphQL with a Node.js and Express.js server.
+- Using MongoDB and the Mongoose ODM for the database.
+- Using queries and mutations for retrieving, adding, updating, and deleting data.
+- Deployed using Heroku (with data).
+- Meets the minimum requirements of a PWA: Uses a web manifest, Uses a service worker for offline functionality, Is installable
+- Offering a polished UI, is responsive and is interactive 
+- Including authentication (JWT) and protects sensitive API key information on the server.
+- The project has a clean repository that meets quality coding standards (file structure, naming conventions, best practices for class and id naming conventions, indentation, quality comments, etc.) and a high-quality README (with unique name, description, technologies used, screenshot, and link to deployed application).
+- This project is part of our REACT portfolio 
+- Improved CSS Styling and using a component library
+- Integrates a Payment Platform integrating the Stripe payment .
 
 ## Contents
 - [Description](#Description)
@@ -117,7 +117,7 @@ THEN I am logged out of the site and presented with a menu with the options to s
 ## Concepts
 
 In this project we applied the following skills:
-	”@apollo/react-hooks": "^3.1.3",
+    ”@apollo/react-hooks": "^3.1.3",
     "@stripe/stripe-js": "^1.10.0",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
@@ -145,13 +145,17 @@ In this project we applied the following skills:
 ## Author: Vanessa Lane, Anita Ganti, Priya Ravi
 
 View the authors' portfolio at:  
-https://anitapeppercorn.github.io/react-portfolio/
+- https://anitapeppercorn.github.io/react-portfolio/
 ![Badge](https://img.shields.io/badge/Github-anitapeppercorn-4cbbb9) 
 ![Profile Image](https://github.com/anitapeppercorn.png?size=50)
-https://priyaravi23.github.io/react-portfolio/
+
+
+- https://priyaravi23.github.io/react-portfolio/
 ![Badge](https://img.shields.io/badge/Github-priyaravi23-4cbbb9) 
 ![Profile Image](https://github.com/priyaravi23.png?size=50)
-https://vanessalane.github.io/react-portfolio/
+
+
+- https://vanessalane.github.io/react-portfolio/
 ![Badge](https://img.shields.io/badge/Github-vanessalane-4cbbb9) 
 ![Profile Image]](https://img.shields.io/badge/Github-vanessalane-4cbbb9) 
 
