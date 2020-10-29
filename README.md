@@ -155,7 +155,7 @@ View the authors' portfolio at:
 ![Profile Image](https://github.com/priyaravi23.png?size=50)
 
 
-- https://vanessalane.github.io/react-portfolio/
+- http://www.vlane.net
 ![Badge](https://img.shields.io/badge/Github-vanessalane-4cbbb9) 
 ![Profile Image]](https://img.shields.io/badge/Github-vanessalane-4cbbb9) 
 
