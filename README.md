@@ -116,7 +116,7 @@ THEN I am logged out of the site and presented with a menu with the options to s
 
 ## Concepts
 
-In this project we applied the following skills:
+In this project we used the following packages:
     ”@apollo/react-hooks": "^3.1.3",
     "@stripe/stripe-js": "^1.10.0",
     "@testing-library/jest-dom": "^4.2.4",
