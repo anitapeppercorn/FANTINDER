@@ -1,4 +1,5 @@
-# FANTINDER Developed with the MERN stack
+# FANTINDER 
+## Developed with the MERN stack
 ### Introduction
 Github Repository
 ``` text 
@@ -161,7 +162,8 @@ View the authors' portfolio at:
 ![Badge](https://img.shields.io/badge/Github-vanessalane-4cbbb9) 
 
 
-[Table of Contents](#Contents) --- [Back to Top](#FANTINDER)
+[Table of Contents](#Contents)
+[Back to Top](#FANTINDER)
 
 
 
