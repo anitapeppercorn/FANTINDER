@@ -17,6 +17,22 @@ db.once('open', async () => {
   }
   const createdUsers = await User.collection.insert(userData);
 
+  // create movie data
+  const movieData = [];
+  for (let i = 0; i < 50; i += 1) {
+    const externalMovieId = faker.random.number();
+    const rating = faker.finance.amount();
+    //(min?: 1, max?: 10)
+    const voteCount = faker.random.number();
+    const title = faker.commerce.productName();
+    const overview = faker.lorem.words(Math.round(Math.random() * 20) + 1);
+    const releaseDate = faker.date.past();
+    const poster = faker.image.imageUrl();
+    const trailer = faker.image.imageUrl();
+    movieData.push({ externalMovieId, rating, voteCount, title, overview, releaseDate, poster, trailer });
+  }
+  const createdMovies = await Movie.collection.insert(movieData);
+
   // create friends
   for (let i = 0; i < 100; i += 1) {
     const randomUserIndex = Math.floor(Math.random() * createdUsers.ops.length);
@@ -28,62 +44,29 @@ db.once('open', async () => {
     }
     await User.updateOne({ _id: userId }, { $addToSet: { friends: friendId } });
   }
-
   // create likedMovies
-  let likedMovies = [];
-  for (let i = 0; i < 100; i += 1) {
-    const externalMovieId = faker.random.number();
-    const rating = faker.finance.amount();
-    //(min?: 1, max?: 10)
-    const voteCount = faker.random.number();
-    const title = faker.commerce.productName();
-    const overview = faker.lorem.words(Math.round(Math.random() * 20) + 1);
-    const releaseDate = faker.date.past();
-    const poster = faker.image.imageUrl();
-    const trailer = faker.image.imageUrl();
-    //example//'https://image.tmdb.org/t/p/w185_and_h278_bestv2/rplLJ2hPcOQmkFhTqUte0MkEaO2.jpg'
-//externalMovieId, rating, voteCount, title, overview, releaseDate, poster, trailer
+    for (let i = 0; i < 100; i += 1) {
+      const randomUserIndex = Math.floor(Math.random() * createdUsers.ops.length);
+      const { _id: userId } = createdUsers.ops[randomUserIndex];
+      let movieId = [];
+      for (let i =0; i < (Math.floor(Math.random() * 10)); i += 1) {
+        const randomMovieIndex = Math.floor(Math.random() * createdMovies.ops.length);
+        movieId = createdMovies.ops[randomMovieIndex];
+      }
+      await User.updateOne({ _id: userId }, { $addToSet: { likedMovies: movieId } });
+    }
 
-    const randomUserIndex = Math.floor(Math.random() * createdUsers.ops.length);
-    const { username, _id: userId } = createdUsers.ops[randomUserIndex];
-
-    const likedMovie = await Movie.create({ externalMovieId, rating, voteCount, title, overview, releaseDate, poster, trailer, username });
-
-    const updatedUser = await User.updateOne(
-      { _id: userId },
-      { $push: { movies: likedMovie._id } }
-    );
-
-    likedMovies.push(likedMovie);
-  }
-
-   // create dislikedMovies
-   let dislikedMovies = [];
-   for (let i = 0; i < 100; i += 1) {
-     const externalMovieId = faker.random.number();
-     const rating = faker.finance.amount();
-     //(min?: 1, max?: 10)
-     const voteCount = faker.random.number();
-     const title = faker.commerce.productName();
-     const overview = faker.lorem.words(Math.round(Math.random() * 20) + 1);
-     const releaseDate = faker.date.past();
-     const poster = faker.image.imageUrl();
-     const trailer = faker.image.imageUrl();
-     //example//'https://image.tmdb.org/t/p/w185_and_h278_bestv2/rplLJ2hPcOQmkFhTqUte0MkEaO2.jpg'
- //externalMovieId, rating, voteCount, title, overview, releaseDate, poster, trailer
- 
-     const randomUserIndex = Math.floor(Math.random() * createdUsers.ops.length);
-     const { username, _id: userId } = createdUsers.ops[randomUserIndex];
- 
-     const dislikedMovie = await Movie.create({ externalMovieId, rating, voteCount, title, overview, releaseDate, poster, trailer, username });
- 
-     const updatedUser = await User.updateOne(
-       { _id: userId },
-       { $push: { movies: dislikedMovie._id } }
-     );
- 
-     dislikedMovies.push(dislikedMovie);
-   }
+  // create dislikedMovies
+        for (let i = 0; i < 100; i += 1) {
+          const randomUserIndex = Math.floor(Math.random() * createdUsers.ops.length);
+          const { _id: userId } = createdUsers.ops[randomUserIndex];
+          let movieId = [];
+          for (let i =0; i < (Math.floor(Math.random() * 10)); i += 1) {
+            const randomMovieIndex = Math.floor(Math.random() * createdMovies.ops.length);
+            movieId = createdMovies.ops[randomMovieIndex];
+          }
+          await User.updateOne({ _id: userId }, { $addToSet: { dislikedMovies: movieId } });
+        }
 
   console.log('all done!');
   process.exit(0);
