@@ -11,7 +11,7 @@ https://fantinder.herokuapp.com/
 
 ```
 
-We built a full stack - MERN Stack media streaming site with Stripe for Payments, and deployed it to Heroku at https://fantinder.herokuapp.com/ This project has played a key role in our journey to becoming a full-stack web developers. It showcases collaborative skills and coding abilities, especially in the context of a scalable, user-focused MERN app.
+We built a full stack - MERN Stack media streaming site and deployed it to Heroku at https://fantinder.herokuapp.com/ This project has played a key role in our journey to becoming a full-stack web developers. It showcases collaborative skills and coding abilities, especially in the context of a scalable, user-focused MERN app.
 Project Requirements were to to create a MERN stack single-page application that works with real-world data to solve a real-world challenge, with a focus on user demand:
 - Using React for the front end.
 - Using GraphQL with a Node.js and Express.js server.
@@ -43,7 +43,7 @@ Additional potential features we considered
 ….Feature 3: As opposed to contact the user externally you can contact another use in app, via an in app chat
 ….Feature 4: Not all users are friends, and users profile favorite content will be compared to their pre-approved friends only
 
-### App Screenshot
+## App Screenshot
 ![](images/FANTINDER.png)
 
 
@@ -117,6 +117,7 @@ THEN I am logged out of the site and presented with a menu with the options to s
 ## Concepts
 
 In this project we used the following packages:
+```text
     ”@apollo/react-hooks": "^3.1.3",
     "@stripe/stripe-js": "^1.10.0",
     "@testing-library/jest-dom": "^4.2.4",
@@ -136,7 +137,7 @@ In this project we used the following packages:
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.4.1"
-
+```
 
 ## License
 [MIT License](./LICENSE)
@@ -159,7 +160,7 @@ View the authors' portfolio at:
 ![Badge](https://img.shields.io/badge/Github-vanessalane-4cbbb9) 
 
 
-[Table of Content](#Table-of-Content) --- [Back to Top](#Movie connecting platform) --- #FANTINDER
+[Table of Content](#Table-of-Content) --- [Back to Top](#FANTINDER)
 
 
 
