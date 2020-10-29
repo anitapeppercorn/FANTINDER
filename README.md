@@ -157,7 +157,7 @@ View the authors' portfolio at:
 
 - http://www.vlane.net
 ![Badge](https://img.shields.io/badge/Github-vanessalane-4cbbb9) 
-![Profile Image]](https://img.shields.io/badge/Github-vanessalane-4cbbb9) 
+
 
 [Table of Content](#Table-of-Content) --- [Back to Top](#Movie connecting platform) --- #FANTINDER
 
