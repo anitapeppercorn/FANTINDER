@@ -23,8 +23,7 @@ Project Requirements were to to create a MERN stack single-page application that
 - Including authentication (JWT) and protects sensitive API key information on the server.
 - The project has a clean repository that meets quality coding standards (file structure, naming conventions, best practices for class and id naming conventions, indentation, quality comments, etc.) and a high-quality README (with unique name, description, technologies used, screenshot, and link to deployed application).
 - This project is part of our REACT portfolio 
-- Improved CSS Styling and using a component library
-- Integrates a Payment Platform integrating the Stripe payment .
+
 
 ## Contents
 - [Description](#Description)
@@ -51,9 +50,10 @@ Additional potential features we considered
 ## User Story
 
 ```text
+
 AS A movie-lover stuck at home, 
-I WANT to search for & save movies,
-purchase movie/s using stripe payments,
+I WANT to see the latest trending movies, 
+Search for, Save, & Delete Movies,
 and connect with other users with matching preferences
 ```
 
