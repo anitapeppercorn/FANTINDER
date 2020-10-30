@@ -22,6 +22,7 @@ import { idbPromise } from "../utils/helpers";
 const SearchMovies = () => {
     // State
     const [state, dispatch] = useFantinderContext();
+    const { movies } = state;
     const [searchInput, setSearchInput] = useState('');
     const [noResultsFound, setNoResultsFound] = useState(false);
     const [searchedMovies, setSearchedMovies] = useState([]);
@@ -34,8 +35,8 @@ const SearchMovies = () => {
 
     // get the movie preferences for the current user to handle like/dislike functionality
     useEffect(() => {
-        // retrieved from server
-        if (data && !(state.dislikedMovies.length || state.likedMovies.length)) {
+        // retrieved from server if movies aren't already in global store
+        if (data && !(movies.length)) {
             dispatch({
                 type: UPDATE_MOVIE_PREFERENCES,
                 likedMovies: data.me.likedMovies,
