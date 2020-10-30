@@ -21,7 +21,8 @@ const MovieCard = (props) => {
     } = props;
 
     return (
-        <Accordion>
+        movie
+        ?   <Accordion>
             <Card>
                 {displayTrailer && movie.trailer
                     ? <ResponsiveEmbed aspectRatio="16by9">
@@ -38,19 +39,21 @@ const MovieCard = (props) => {
                 }
                 <Card.Body>
                     <Card.Title>
-                      {movie.title}
+                    {movie.title}
                     </Card.Title>
-                        <StarRatings
-                            rating={movie.rating/2}
-                            numberOfStars={5}
-                            name={`${movie._id}-rating`}
-                            starDimension="20px"
-                            starSpacing="1px"
-                        />
-
-                        <Card.Text className='small'>
-                            ({movie.voteCount?.toLocaleString()} ratings)
-                        </Card.Text>
+                    { movie.rating
+                        ?   <StarRatings
+                                rating={movie.rating/2}
+                                numberOfStars={5}
+                                name={`${movie._id}-rating`}
+                                starDimension="20px"
+                                starSpacing="1px"
+                            />
+                        :   null
+                    }
+                    <Card.Text className='small'>
+                        ({movie.voteCount?.toLocaleString()} ratings)
+                    </Card.Text>
                     <Accordion.Toggle className="small" as={Card.Link} variant="link" eventKey={movie._id}>
                         Click to expand for more details
                     </Accordion.Toggle>
@@ -62,29 +65,29 @@ const MovieCard = (props) => {
                         </Card.Body>
                     </Accordion.Collapse>
                 </Card.Body>
-                    {Auth.loggedIn()
-                    ?   
-                        <Card.Footer className="d-flex justify-content-between">
-                            <Button
-                                className="movie-card-button"
-                                disabled={dislikedMovies?.some(dislikedMovie => dislikedMovie._id === movie._id)}
-                                variant={dislikedMovies?.some(dislikedMovie => dislikedMovie._id === movie._id) ? "outline-secondary" : "outline-danger"}
-                                onClick={() => dislikeMovieHandler(movie)}>
-                                    {dislikedMovies?.some(dislikedMovie => dislikedMovie._id === movie._id)
-                                    ? <span>Disliked!</span>
-                                    : <i className='far fa-thumbs-down fa-2x' />}
-                            </Button>
-                            <Button
-                                className="movie-card-button"
-                                disabled={likedMovies?.some(likedMovie => likedMovie._id === movie._id)}
-                                variant={likedMovies?.some(likedMovie => likedMovie._id === movie._id) ? "outline-secondary" : "outline-success"}
-                                onClick={() => likeMovieHandler(movie)}>
-                                    {likedMovies?.some(likedMovie => likedMovie._id === movie._id)
-                                    ? <span>Liked!</span>
-                                    : <i className='far fa-thumbs-up fa-2x' />}
-                            </Button>
-                        </Card.Footer>
-                    : displaySkip &&
+
+                {Auth.loggedIn()
+                ?   <Card.Footer className="d-flex justify-content-between">
+                        <Button
+                            className="movie-card-button"
+                            disabled={dislikedMovies?.some(dislikedMovie => dislikedMovie._id === movie._id)}
+                            variant={dislikedMovies?.some(dislikedMovie => dislikedMovie._id === movie._id) ? "outline-secondary" : "outline-danger"}
+                            onClick={() => dislikeMovieHandler(movie)}>
+                                {dislikedMovies?.some(dislikedMovie => dislikedMovie._id === movie._id)
+                                ? <span>Disliked!</span>
+                                : <i className='far fa-thumbs-down fa-2x' />}
+                        </Button>
+                        <Button
+                            className="movie-card-button"
+                            disabled={likedMovies?.some(likedMovie => likedMovie._id === movie._id)}
+                            variant={likedMovies?.some(likedMovie => likedMovie._id === movie._id) ? "outline-secondary" : "outline-success"}
+                            onClick={() => likeMovieHandler(movie)}>
+                                {likedMovies?.some(likedMovie => likedMovie._id === movie._id)
+                                ? <span>Liked!</span>
+                                : <i className='far fa-thumbs-up fa-2x' />}
+                        </Button>
+                    </Card.Footer>
+                :   displaySkip &&
                         <Card.Footer className="text-center">
                             <Button
                                 className="movie-card-button"
@@ -93,9 +96,10 @@ const MovieCard = (props) => {
                                     Next Movie
                             </Button>
                         </Card.Footer>
-                    }
-            </Card>
-        </Accordion>
+                }
+                </Card>
+            </Accordion>
+        :   null
     )
 }
 

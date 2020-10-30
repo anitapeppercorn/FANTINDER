@@ -11,34 +11,34 @@ import { GET_USER } from '../utils/queries';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 // Context API
 import { useFantinderContext } from "../utils/GlobalState";
-import { UPDATE_DISLIKED_MOVIES, UPDATE_LIKED_MOVIES } from '../utils/actions';
+import {
+    ADD_TO_DISLIKED_MOVIES,
+    ADD_TO_LIKED_MOVIES,
+    UPDATE_MOVIE_PREFERENCES
+} from '../utils/actions';
 // indexedDB
 import { idbPromise } from "../utils/helpers";
 
 const SearchMovies = () => {
-    // state management
-    const [state, dispatch] = useFantinderContext();
+    // State
+    const [, dispatch] = useFantinderContext();
     const [searchInput, setSearchInput] = useState('');
     const [noResultsFound, setNoResultsFound] = useState(false);
     const [searchedMovies, setSearchedMovies] = useState([]);
     const [searching, setSearching] = useState(false);
-    // graph ql
+    // GraphQL
     const [addMovie, { addMovieError }] = useMutation(ADD_MOVIE);
-    const [dislikeMovie, { dislikeError }] = useMutation(DISLIKE_MOVIE);
-    const [likeMovie, { likeError }] = useMutation(LIKE_MOVIE);
+    const [dislikeMovie] = useMutation(DISLIKE_MOVIE);
+    const [likeMovie] = useMutation(LIKE_MOVIE);
     const { loading, data } = useQuery(GET_USER);
 
     // get the movie preferences for the current user to handle like/dislike functionality
     useEffect(() => {
         if (data && data.me) {
             dispatch({
-                type: UPDATE_DISLIKED_MOVIES,
+                type: UPDATE_MOVIE_PREFERENCES,
+                likedMovies: data.me.likedMovies,
                 dislikedMovies: data.me.dislikedMovies
-            })
-
-            dispatch({
-                type: UPDATE_LIKED_MOVIES,
-                likedMovies: data.me.likedMovies
             })
 
             data.me.dislikedMovies.forEach((movie) => {
@@ -52,19 +52,15 @@ const SearchMovies = () => {
             });
         } else if (!loading) {
             idbPromise('dislikedMovies', 'get').then(dislikedMovies => {
-              dispatch({
-                type: UPDATE_DISLIKED_MOVIES,
-                dislikedMovies: dislikedMovies
-              });
-            });
-
-            idbPromise('likedMovies', 'get').then(likedMovies => {
-              dispatch({
-                type: UPDATE_LIKED_MOVIES,
-                likedMovies: likedMovies
-              });
-            });
-          }
+                idbPromise('likedMovies', 'get').then(likedMovies => {
+                    dispatch({
+                        type: UPDATE_MOVIE_PREFERENCES,
+                        likedMovies: likedMovies,
+                        dislikedMovies: dislikedMovies
+                    })
+                })
+            })
+        }
     }, [data, loading, dispatch]);
 
     const handleFormSubmit = async (event) => {
@@ -113,64 +109,52 @@ const SearchMovies = () => {
         setNoResultsFound(false);
     };
 
-    const handleLikeMovie = async (likedMovie) => {
-        try {
-            // update the db
-            let { data } = await likeMovie({
-                variables: { movieId: likedMovie._id }
-            });
+    const handleLikeMovie = (likedMovie) => {
+        // update the db
+        likeMovie({
+            variables: { movieId: likedMovie._id }
+        })
+        .then(data => {
+            if (data) {
+                // update global state
+                dispatch({
+                    type: ADD_TO_LIKED_MOVIES,
+                    movie: likedMovie
+                });
+    
+                // update idb
+                idbPromise('likedMovies', 'put', likedMovie);
+                idbPromise('dislikedMovies', 'delete', likedMovie);
 
-            // throw an error if the mutation failed
-            if (likeError) {
-                throw new Error('Something went wrong!');
+            } else {
+                console.error("Couldn't like the movie!");
             }
-
-            // update global state
-            dispatch({
-                type: UPDATE_LIKED_MOVIES,
-                likedMovies: data.likeMovie.likedMovies
-            });
-            dispatch({
-                type: UPDATE_DISLIKED_MOVIES,
-                dislikedMovies: data.likeMovie.dislikedMovies
-            });
-
-            // update idb
-            idbPromise('likedMovies', 'put', likedMovie);
-            idbPromise('dislikedMovies', 'delete', likedMovie);
-        } catch (err) {
-            console.error(err);
-        }
+        })
+        .catch(err => console.error(err));
     };
 
-    const handleDislikeMovie = async (dislikedMovie) => {
-        try {
-            // update the db
-            let { data } = await dislikeMovie({
-                variables: { movieId: dislikedMovie._id }
-            });
+    const handleDislikeMovie = (dislikedMovie) => {
+        // update the db
+        dislikeMovie({
+            variables: { movieId: dislikedMovie._id }
+        })
+        .then(data => {
+            if (data) {
+                // update global state
+                dispatch({
+                    type: ADD_TO_DISLIKED_MOVIES,
+                    movie: dislikedMovie
+                });
+    
+                // update idb
+                idbPromise('likedMovies', 'delete', dislikedMovie);
+                idbPromise('dislikedMovies', 'put', dislikedMovie);
 
-            // throw an error if the mutation failed
-            if (dislikeError) {
-                throw new Error('Something went wrong!');
+            } else {
+                console.error("Couldn't dislike the movie!");
             }
-
-            // update global state
-            dispatch({
-                type: UPDATE_LIKED_MOVIES,
-                likedMovies: data.dislikeMovie.likedMovies
-            });
-            dispatch({
-                type: UPDATE_DISLIKED_MOVIES,
-                dislikedMovies: data.dislikeMovie.dislikedMovies
-            });
-
-            // update idb
-            idbPromise('likedMovies', 'put', dislikedMovie);
-            idbPromise('dislikedMovies', 'delete', dislikedMovie);
-        } catch (err) {
-            console.error(err);
-        }
+        })
+        .catch(err => console.error(err));
     };
 
     return (
@@ -198,17 +182,17 @@ const SearchMovies = () => {
                                 {searchedMovies.length > 0 && `Viewing ${searchedMovies.length} results:`}
                             </h2>
                             <CardColumns>
-                            {searchedMovies?.map(movie => {
-                                return (
-                                    <MovieCard
-                                        key={movie._id}
-                                        movie={movie}
-                                        displayTrailer
-                                        likeMovieHandler={handleLikeMovie}
-                                        dislikeMovieHandler={handleDislikeMovie}
-                                    />
-                                )
-                            })}
+                                {searchedMovies?.map(movie => {
+                                    return (
+                                        <MovieCard
+                                            key={movie._id}
+                                            movie={movie}
+                                            displayTrailer
+                                            likeMovieHandler={handleLikeMovie}
+                                            dislikeMovieHandler={handleDislikeMovie}
+                                        />
+                                    )
+                                })}
                             </CardColumns>
                         </>
                 }
