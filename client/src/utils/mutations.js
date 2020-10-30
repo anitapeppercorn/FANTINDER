@@ -58,9 +58,25 @@ export const LIKE_MOVIE = gql`
         likeMovie(movieId: $movieId) {
             likedMovies {
                 _id
+                externalMovieId
+                title
+                overview
+                releaseDate
+                rating
+                voteCount
+                poster
+                trailer
             }
             dislikedMovies{
                 _id
+                externalMovieId
+                title
+                overview
+                releaseDate
+                rating
+                voteCount
+                poster
+                trailer
             }
         }
     }
@@ -71,9 +87,25 @@ export const DISLIKE_MOVIE = gql`
         dislikeMovie(movieId: $movieId) {
             likedMovies {
                 _id
+                externalMovieId
+                title
+                overview
+                releaseDate
+                rating
+                voteCount
+                poster
+                trailer
             }
             dislikedMovies{
                 _id
+                externalMovieId
+                title
+                overview
+                releaseDate
+                rating
+                voteCount
+                poster
+                trailer
             }
         }
     }
