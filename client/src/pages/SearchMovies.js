@@ -21,7 +21,7 @@ import { idbPromise } from "../utils/helpers";
 
 const SearchMovies = () => {
     // State
-    const [, dispatch] = useFantinderContext();
+    const [state, dispatch] = useFantinderContext();
     const [searchInput, setSearchInput] = useState('');
     const [noResultsFound, setNoResultsFound] = useState(false);
     const [searchedMovies, setSearchedMovies] = useState([]);
@@ -34,7 +34,8 @@ const SearchMovies = () => {
 
     // get the movie preferences for the current user to handle like/dislike functionality
     useEffect(() => {
-        if (data && data.me) {
+        // retrieved from server
+        if (data && !(state.dislikedMovies.length || state.likedMovies.length)) {
             dispatch({
                 type: UPDATE_MOVIE_PREFERENCES,
                 likedMovies: data.me.likedMovies,
@@ -50,7 +51,9 @@ const SearchMovies = () => {
                 idbPromise('dislikedMovies', 'delete', movie);
                 idbPromise('likedMovies', 'put', movie);
             });
-        } else if (!loading) {
+        }
+        // get cache from idb
+        else if (!loading) {
             idbPromise('dislikedMovies', 'get').then(dislikedMovies => {
                 idbPromise('likedMovies', 'get').then(likedMovies => {
                     dispatch({
@@ -61,7 +64,7 @@ const SearchMovies = () => {
                 })
             })
         }
-    }, [data, loading, dispatch]);
+    }, [data, loading, dispatch, state.dislikedMovies.length, state.likedMovies.length]);
 
     const handleFormSubmit = async (event) => {
         event.preventDefault();
