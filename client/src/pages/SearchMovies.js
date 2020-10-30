@@ -43,7 +43,7 @@ const SearchMovies = () => {
         }
         const cleanedMovies = await cleanMovieData(results);
 
-        const updatedSearchedMovies = searchedMovies;
+        const updatedSearchedMovies = [];
         for (let i=0; i < cleanedMovies.length; i++) {
 
             // add the movie to the DB
@@ -67,30 +67,26 @@ const SearchMovies = () => {
                 <Container>
                     <Form onSubmit={(event) => handleFormSubmit(event, searchInput)}>
                         <Form.Label className="h3">Find your favorite movies</Form.Label>
-                        <Form.Group className="d-flex">
-                            <Form.Control
-                                name='searchInput'
-                                value={searchInput}
-                                onChange={(e) => setSearchInput(e.target.value)}
-                                type='text'
-                                placeholder='The Lord of the Rings'
-                            />
-                            <Button type='submit' className='ml-2'>
-                                Search
-                            </Button>
-                        </Form.Group>
-                        { noResultsFound && <p>No results found!</p> }
+                        <Form.Control
+                            name='searchInput'
+                            value={searchInput}
+                            onChange={(e) => setSearchInput(e.target.value)}
+                            type='text'
+                            placeholder='The Lord of the Rings'
+                        />
+                        <Button type='submit' className="mt-2">Search</Button>
                     </Form>
                 </Container>
             </Jumbotron>
             <Container>
-                {searchedMovies && !searching &&
-                    <>
-                        <h2 className="results-heading">
-                            {searchedMovies.length > 0 && `Viewing ${searchedMovies.length} results:`}
-                        </h2>
-                        <MovieCards displayTrailers moviesToDisplay={searchedMovies} />
-                    </> 
+                {!searching && noResultsFound
+                    ?   <h2 className="results-heading">No movies found! Please try another search.</h2>
+                    :   <>
+                            <h2 className="results-heading">
+                                {searchedMovies.length > 0 && `Viewing ${searchedMovies.length} results:`}
+                            </h2>
+                            <MovieCards displayTrailers moviesToDisplay={searchedMovies} />
+                        </>
                 }
             </Container>
         </>
