@@ -19,7 +19,7 @@ import { idbPromise } from "../utils/helpers";
 const SavedMovies = () => {
     // State
     const [state, dispatch] = useFantinderContext();
-    const { likedMovies } = state;
+    const { likedMovies, movies } = state;
     const [moviesToDisplay, setMoviesToDisplay] = useState([]);
     // GraphQL
     const [dislikeMovie] = useMutation(DISLIKE_MOVIE);
@@ -27,8 +27,8 @@ const SavedMovies = () => {
     const { loading, data } = useQuery(GET_USER);
 
     useEffect(() => {
-        // already in global store
-        if (likedMovies.length) {
+        // movies are already in global store
+        if (movies.length) {
             setMoviesToDisplay(likedMovies);
         } 
         // retrieved from server
