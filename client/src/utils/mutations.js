@@ -60,12 +60,15 @@ export const ADD_MOVIE = gql`
             voteCount
             poster
             trailer
+            likedUsers {
+                _id
+                username
+            }
+            dislikedUsers {
+                _id
+                username
+            }
         }
-    }
-`
-export const ADD_MOVIES = gql`
-    mutation addMovies($input: [MovieInput!]) {
-        addMovies(input:$input)
     }
 `
 
