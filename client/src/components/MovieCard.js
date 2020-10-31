@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 
 // import bootstrap-react components
-import { Accordion, AccordionContext, Button, Card, ResponsiveEmbed } from 'react-bootstrap';
+import { Accordion, AccordionContext, Button, Card, ResponsiveEmbed, Row, Col } from 'react-bootstrap';
 import StarRatings from 'react-star-ratings';
 import { useAccordionToggle } from 'react-bootstrap/AccordionToggle';
 
@@ -38,8 +38,8 @@ const MovieCard = (props) => {
                 onClick={decoratedOnClick}
             >
                 {isCurrentEventKey
-                ?   <span>Collapse <i class="fas fa-chevron-up"></i></span>
-                :   <span>Click for details <i class="fas fa-chevron-down"></i></span>
+                ?   <span>Collapse <i className="fas fa-chevron-up"></i></span>
+                :   <span>Click for details <i className="fas fa-chevron-down"></i></span>
                 }
             </Button>
         );
@@ -63,11 +63,12 @@ const MovieCard = (props) => {
                     : (movie.poster && <Card.Img src={movie.poster} alt={`The cover for ${movie.title}`} variant='top' />)
                 }
                 <Card.Body>
-                        <Card.Title>
-                            {movie.title}
-                        </Card.Title>
-                    <div className="d-flex justify-content-between align-items-end">
-                        { movie.rating
+                    <Card.Title>
+                        {movie.title}
+                    </Card.Title>
+                    <Row>
+                        <Col sm={6}>
+                            { movie.rating
                             ?   <StarRatings
                                     rating={movie.rating/2}
                                     numberOfStars={5}
@@ -76,12 +77,15 @@ const MovieCard = (props) => {
                                     starSpacing="1px"
                                 />
                             :   null
-                        }
-                        <ContextAwareToggle eventKey={movie._id} />
-                    </div>
-                    <Card.Text className="small">
-                        ({movie.voteCount?.toLocaleString()} ratings)
-                    </Card.Text>
+                            }
+                            <Card.Text className="small">
+                            ({movie.voteCount?.toLocaleString()} ratings)
+                            </Card.Text>
+                        </Col>
+                        <Col className="text-right">
+                            <ContextAwareToggle eventKey={movie._id} />
+                        </Col>
+                    </Row>
                 </Card.Body>
                     <Accordion.Collapse eventKey={movie._id}>
                         <Card.Body>
