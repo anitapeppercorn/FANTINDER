@@ -47,24 +47,26 @@ const Homepage = () => {
             )
         }
         // if data, means we're online
-        else if (data || !Auth.loggedIn()) {
-            console.log('updating movie preferences')
-            // update movie preferences
-            dispatch({
-                type: UPDATE_MOVIE_PREFERENCES,
-                likedMovies: data.me.likedMovies,
-                dislikedMovies: data.me.dislikedMovies
-            })
+        else if (data) {
+            if (Auth.loggedIn()) {
+                console.log('updating movie preferences')
+                // update movie preferences
+                dispatch({
+                    type: UPDATE_MOVIE_PREFERENCES,
+                    likedMovies: data.me.likedMovies,
+                    dislikedMovies: data.me.dislikedMovies
+                })
 
-            data.me.dislikedMovies.forEach((movie) => {
-                idbPromise('dislikedMovies', 'put', movie);
-                idbPromise('likedMovies', 'delete', movie);
-            });
-    
-            data.me.likedMovies.forEach((movie) => {
-                idbPromise('dislikedMovies', 'delete', movie);
-                idbPromise('likedMovies', 'put', movie);
-            });
+                data.me.dislikedMovies.forEach((movie) => {
+                    idbPromise('dislikedMovies', 'put', movie);
+                    idbPromise('likedMovies', 'delete', movie);
+                });
+        
+                data.me.likedMovies.forEach((movie) => {
+                    idbPromise('dislikedMovies', 'delete', movie);
+                    idbPromise('likedMovies', 'put', movie);
+                });
+            }
 
             console.log('pinging TMDB API to get trending movies')
             // get the movies to display
@@ -119,7 +121,7 @@ const Homepage = () => {
                 })
             })
         }
-    }, [movies, data, likedMovies, dislikedMovies, addMovie, addMovieError, dispatch])
+    }, [movies, data, loading, likedMovies, dislikedMovies, addMovie, addMovieError, dispatch])
 
     const handleLikeMovie = (likedMovie) => {
         // update the db
@@ -174,7 +176,6 @@ const Homepage = () => {
             const currentMovie = await moviesToDisplay[0];
             const updatedMovies = await moviesToDisplay.slice(1,);
             updatedMovies.push(currentMovie);
-            console.log({ updatedMovies });
             setMoviesToDisplay(updatedMovies)
         }
         // if this is the only movie left, set moviesToDisplay to an empty array.
