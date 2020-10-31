@@ -1,4 +1,5 @@
 //generate dummy data
+const bcrypt = require('bcrypt');
 const faker = require('faker');
 const db = require('../config/connection');
 const { Movie, User } = require('../models');
@@ -9,10 +10,10 @@ db.once('open', async () => {
 
   // create user data
   const userData = [];
-  for (let i = 0; i < 50; i += 1) {
-    const username = faker.internet.userName();
-    const email = faker.internet.email(username);
-    const password = faker.internet.password();
+  for (let i = 1; i < 51; i++) {
+    const username = `user${i}`;
+    const email = `${username}@gmail.com`;
+    const password = await bcrypt.hash("password", 10)  // saltRounds = 10 in User.js
     userData.push({ username, email, password });
   }
   const createdUsers = await User.collection.insertMany(userData);
@@ -21,8 +22,8 @@ db.once('open', async () => {
   const movieData = [];
   for (let i = 0; i < 50; i += 1) {
     const externalMovieId = faker.random.number();
-    const rating = faker.finance.amount();
-    const voteCount = faker.random.number({ 'min': 10, 'max': 50 });
+    const rating = faker.random.number({ 'min': 0, 'max': 10 });
+    const voteCount = faker.random.number();
     const title = faker.commerce.productName();
     const overview = faker.lorem.words(Math.round(Math.random() * 20) + 1);
     const releaseDate = faker.date.past();
