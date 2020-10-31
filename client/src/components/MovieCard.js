@@ -92,7 +92,7 @@ const MovieCard = (props) => {
                             <Button
                                 className="movie-card-button"
                                 size="lg"
-                                onClick={() => skipMovieHandler(movie._id)}>
+                                onClick={skipMovieHandler}>
                                     Next Movie
                             </Button>
                         </Card.Footer>
