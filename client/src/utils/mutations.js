@@ -23,9 +23,25 @@ export const LOGIN_USER = gql`
                 email
                 likedMovies {
                     _id
+                    externalMovieId
+                    title
+                    overview
+                    releaseDate
+                    rating
+                    voteCount
+                    poster
+                    trailer
                 }
                 dislikedMovies{
                     _id
+                    externalMovieId
+                    title
+                    overview
+                    releaseDate
+                    rating
+                    voteCount
+                    poster
+                    trailer
                 }
             }
         }
