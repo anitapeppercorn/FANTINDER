@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useContext } from 'react';
 
 // import bootstrap-react components
-import { Accordion, Button, Card, ResponsiveEmbed } from 'react-bootstrap';
+import { Accordion, AccordionContext, Button, Card, ResponsiveEmbed } from 'react-bootstrap';
 import StarRatings from 'react-star-ratings';
+import { useAccordionToggle } from 'react-bootstrap/AccordionToggle';
 
 // import utils
 import Auth from '../utils/auth';
@@ -19,6 +20,30 @@ const MovieCard = (props) => {
         skipMovieHandler,
         displaySkip
     } = props;
+
+    function ContextAwareToggle({ eventKey, callback }) {
+        const currentEventKey = useContext(AccordionContext);
+    
+        const decoratedOnClick = useAccordionToggle(
+            eventKey,
+            () => callback && callback(eventKey),
+        );
+    
+        const isCurrentEventKey = currentEventKey === eventKey;
+      
+        return (
+            <Button
+                variant="link"
+                className={`small link ${isCurrentEventKey ? 'text-muted' : '' }`}
+                onClick={decoratedOnClick}
+            >
+                {isCurrentEventKey
+                ?   <span>Collapse <i class="fas fa-chevron-up"></i></span>
+                :   <span>Click for details <i class="fas fa-chevron-down"></i></span>
+                }
+            </Button>
+        );
+    }      
 
     return (
         movie
@@ -38,25 +63,26 @@ const MovieCard = (props) => {
                     : (movie.poster && <Card.Img src={movie.poster} alt={`The cover for ${movie.title}`} variant='top' />)
                 }
                 <Card.Body>
-                    <Card.Title>
-                    {movie.title}
-                    </Card.Title>
-                    { movie.rating
-                        ?   <StarRatings
-                                rating={movie.rating/2}
-                                numberOfStars={5}
-                                name={`${movie._id}-rating`}
-                                starDimension="20px"
-                                starSpacing="1px"
-                            />
-                        :   null
-                    }
-                    <Card.Text className='small'>
+                        <Card.Title>
+                            {movie.title}
+                        </Card.Title>
+                    <div className="d-flex justify-content-between align-items-end">
+                        { movie.rating
+                            ?   <StarRatings
+                                    rating={movie.rating/2}
+                                    numberOfStars={5}
+                                    name={`${movie._id}-rating`}
+                                    starDimension="20px"
+                                    starSpacing="1px"
+                                />
+                            :   null
+                        }
+                        <ContextAwareToggle eventKey={movie._id} />
+                    </div>
+                    <Card.Text className="small">
                         ({movie.voteCount?.toLocaleString()} ratings)
                     </Card.Text>
-                    <Accordion.Toggle className="small" as={Card.Link} variant="link" eventKey={movie._id}>
-                        Click to expand for more details
-                    </Accordion.Toggle>
+                </Card.Body>
                     <Accordion.Collapse eventKey={movie._id}>
                         <Card.Body>
                             <Card.Text>Plot Summary</Card.Text>
@@ -64,7 +90,6 @@ const MovieCard = (props) => {
                             <Card.Text className='small'>Release Date: {movie.releaseDate}</Card.Text>
                         </Card.Body>
                     </Accordion.Collapse>
-                </Card.Body>
 
                 {Auth.loggedIn()
                 ?   <Card.Footer className="d-flex justify-content-between">

@@ -85,7 +85,6 @@ const Homepage = () => {
 
                             const { data: newMovieData } = await result;
                             const { addMovie : newMovie } = await newMovieData;
-                            console.log(newMovie);
 
                             // update state.movies
                             dispatch({
