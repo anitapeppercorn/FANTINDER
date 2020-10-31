@@ -28,7 +28,7 @@ const SavedMovies = () => {
 
     useEffect(() => {
         // movies are already in global store
-        if (movies.length) {
+        if (likedMovies.length) {
             setMoviesToDisplay(likedMovies);
         } 
         // retrieved from server
