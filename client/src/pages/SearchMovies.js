@@ -9,22 +9,22 @@ import { searchTMDB } from '../utils/API';
 import { ADD_MOVIE, DISLIKE_MOVIE, LIKE_MOVIE } from '../utils/mutations';
 import { GET_USER } from '../utils/queries';
 import { useMutation, useQuery } from '@apollo/react-hooks';
-// Context API
+// Global State
 import { useFantinderContext } from "../utils/GlobalState";
 import {
     ADD_TO_DISLIKED_MOVIES,
     ADD_TO_LIKED_MOVIES,
     UPDATE_MOVIE_PREFERENCES
 } from '../utils/actions';
-// indexedDB
+// IndexedDB
 import { idbPromise } from "../utils/helpers";
 
 const SearchMovies = () => {
     // State
     const [state, dispatch] = useFantinderContext();
     const { movies } = state;
+    const [resultsFound, setResultsFound] = useState(true);
     const [searchInput, setSearchInput] = useState('');
-    const [noResultsFound, setNoResultsFound] = useState(false);
     const [searchedMovies, setSearchedMovies] = useState([]);
     const [searching, setSearching] = useState(false);
     // GraphQL
@@ -65,7 +65,7 @@ const SearchMovies = () => {
                 })
             })
         }
-    }, [data, loading, dispatch, state.dislikedMovies.length, state.likedMovies.length]);
+    }, [data, loading, dispatch, movies.length]);
 
     const handleFormSubmit = async (event) => {
         event.preventDefault();
@@ -87,7 +87,7 @@ const SearchMovies = () => {
 
         // return early if no results found
         if (results.length === 0) {
-            setNoResultsFound(true);
+            setResultsFound(false);
             setSearching(false);
             return;
         }
@@ -110,7 +110,7 @@ const SearchMovies = () => {
 
         setSearchedMovies(updatedSearchedMovies);
         setSearching(false);
-        setNoResultsFound(false);
+        setResultsFound(true);
     };
 
     const handleLikeMovie = (likedMovie) => {
@@ -179,7 +179,7 @@ const SearchMovies = () => {
                 </Container>
             </Jumbotron>
             <Container>
-                {!searching && noResultsFound
+                {!searching && !resultsFound
                     ?   <h2 className="results-heading">No movies found! Please try another search.</h2>
                     :   <>
                             <h2 className="results-heading">

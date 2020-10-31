@@ -61,7 +61,7 @@ const SavedMovies = () => {
                 })
             })
         }
-    }, [state, data, dispatch, likedMovies, loading])
+    }, [state, data, dispatch, movies.length, likedMovies, loading])
 
     const handleLikeMovie = (likedMovie) => {
         // update the db
