@@ -92,7 +92,9 @@ const MovieCard = (props) => {
                             <Card.Text>Plot Summary</Card.Text>
                             <Card.Text className='small'>{movie.overview}</Card.Text>
                             <Card.Text className='small'>Release Date: {movie.releaseDate}</Card.Text>
-                            <Card.Text className='small'>{`${movie.likedUsers.length} users liked this movie`}</Card.Text>
+                            <Card.Text className='small'>
+                                {`${movie.likedUsers.length} ${movie.likedUsers.length === 1 ? 'user' : 'users'} liked this movie`}
+                            </Card.Text>
                         </Card.Body>
                     </Accordion.Collapse>
 
