@@ -73,7 +73,7 @@ const Homepage = () => {
                 const isLiked = likedMovies.some(likedMovie => likedMovie._id === movies[i]._id);
                 const isDisliked = dislikedMovies.some(dislikedMovie => dislikedMovie._id === movies[i]._id);
 
-                if (!isLiked && !isDisliked) {
+                if (!isLiked && !isDisliked && movies[i].trailer) {
                     setMovieIndex(i);
                     break;
                 }
@@ -85,8 +85,8 @@ const Homepage = () => {
     useEffect(() => {
         if (!movies.length) {
             // if we're online, ping the API to get our movie preferences
-            if (data) {
-                console.log("Online, Pinging TMDB API to get trending movies");
+            try {
+                console.log("Pinging TMDB API to get trending movies");
                 getTrendingMovies('week').then(res => {
                     if (res.ok) {
                         res.json().then(async ({ results }) => {
@@ -119,9 +119,10 @@ const Homepage = () => {
                     }
                 })
             }
-            // if we're offline, use idb to update movie preferences
-            else if (!loading) {
-                console.log("Offline")
+            // if we can't load from TMDB, try getting them from idb
+            catch {
+                console.log("Couldn't get data from TMDB API. Using IDB to display movies.");
+
                 idbPromise('movies', 'get').then(movies => {
                     if (movies.length) {
                         console.log('Using IDB to get trending movies');
@@ -187,7 +188,6 @@ const Homepage = () => {
         .catch(err => console.error(err));
     };
 
-
     const handleSkipMovie = async () => {
         // put the current movie at the end of the array if it's not the only movie
         if (movies.length) {
@@ -195,7 +195,7 @@ const Homepage = () => {
                 const isLiked = likedMovies.some(likedMovie => likedMovie._id === movies[i]._id);
                 const isDisliked = dislikedMovies.some(dislikedMovie => dislikedMovie._id === movies[i]._id);
 
-                if (!isLiked && !isDisliked) {
+                if (!isLiked && !isDisliked && movies[i].trailer) {
                     setMovieIndex(i);
                     break;
                 }
