@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 // Components
 import { Jumbotron, CardColumns, Container } from 'react-bootstrap';
 import MovieCard from '../components/MovieCard';
@@ -19,53 +19,37 @@ import { idbPromise } from "../utils/helpers";
 const SavedMovies = () => {
     // State
     const [state, dispatch] = useFantinderContext();
-    const { likedMovies, movies } = state;
-    const [moviesToDisplay, setMoviesToDisplay] = useState('');
+    const { likedMovies } = state;
     // GraphQL
     const [dislikeMovie] = useMutation(DISLIKE_MOVIE);
     const [likeMovie] = useMutation(LIKE_MOVIE);
     const { loading, data } = useQuery(GET_USER);
 
     useEffect(() => {
-        // movies are already in global store
-        if (likedMovies.length >= 0 ) {
-            console.log('setting movies to likedMovies in global store')
-            setMoviesToDisplay(state.likedMovies);
-            console.log(moviesToDisplay)
-        } 
-        // retrieved from server
-        else if (data && data.me) {
-            console.log('updating movie prefs based on db')
+        // if we're online, use sever to update movie preferences
+        if (data && data.me && !likedMovies.length) {
+            console.log("Online, using data from server to update movie preferences")
             dispatch({
                 type: UPDATE_MOVIE_PREFERENCES,
                 likedMovies: data.me.likedMovies,
                 dislikedMovies: data.me.dislikedMovies
-            })
-
-            data.me.dislikedMovies.forEach((movie) => {
-                idbPromise('dislikedMovies', 'put', movie);
-                idbPromise('likedMovies', 'delete', movie);
-            });
-    
-            data.me.likedMovies.forEach((movie) => {
-                idbPromise('dislikedMovies', 'delete', movie);
-                idbPromise('likedMovies', 'put', movie);
             });
         }
-        // get cache from idb
-        else if (!loading) {
-            idbPromise('dislikedMovies', 'get').then(dislikedMovies => {
-                idbPromise('likedMovies', 'get').then(likedMovies => {
+        // if we're offline, use idb to update movie preferences
+        else if (!loading && !likedMovies.length) {
+            console.log("Offline, using data from idb to update movie preferences")
+            idbPromise('likedMovies', 'get').then(likedMovies => {
+                idbPromise('dislikedMovies', 'get').then(dislikedMovies => {
                     dispatch({
                         type: UPDATE_MOVIE_PREFERENCES,
-                        likedMovies: likedMovies,
-                        dislikedMovies: dislikedMovies
+                        likedMovies,
+                        dislikedMovies
                     })
                 })
             })
         }
-    }, [state, data, dispatch, movies.length, likedMovies, loading])
-
+    })
+    
     const handleLikeMovie = (likedMovie) => {
         // update the db
         likeMovie({
@@ -123,11 +107,9 @@ const SavedMovies = () => {
             </Jumbotron>
             <Container>
                 <h2 className="pb-5">
-                    {loading
-                        ?   null
-                        :   likedMovies?.length > 0 
-                                ? `Displaying ${likedMovies.length} saved ${likedMovies.length === 1 ? "movie" : "movies"}.`
-                                : "You have no saved movies!"   
+                    {likedMovies?.length > 0 
+                    ? `Displaying ${likedMovies.length} saved ${likedMovies.length === 1 ? "movie" : "movies"}:`
+                    : "You have no saved movies!"   
                     }
                     
                 </h2>
