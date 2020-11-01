@@ -26,101 +26,114 @@ import Auth from '../utils/auth';
 const Homepage = () => {
     const [state, dispatch] = useFantinderContext();
     const { movies, likedMovies, dislikedMovies } = state
-    const [moviesToDisplay, setMoviesToDisplay] = useState([]);
+    const [movieIndex, setMovieIndex] = useState('');
     // GraphQL
     const [addMovie, { addMovieError }] = useMutation(ADD_MOVIE);
     const [dislikeMovie] = useMutation(DISLIKE_MOVIE);
     const [likeMovie] = useMutation(LIKE_MOVIE);
     const { loading, data } = useQuery(GET_USER);
 
+    // hook for updating movie preferences
     useEffect(() => {
-        // get data from TMDB API if we're online
-        if (movies.length > 0 ) {
-            console.log('using the movies in global store')
-            // set moviesToDisplay to an array of movies that haven't been liked or disliked
-            setMoviesToDisplay(
-                movies.filter(movie => {
-                    const isLiked = likedMovies.some(likedMovie => likedMovie._id === movie._id);
-                    const isDisliked = dislikedMovies.some(dislikedMovie => dislikedMovie._id === movie._id);
-                    return !isLiked && !isDisliked;
-                })
-            )
-        }
-        // if data, means we're online
-        else if (data) {
-            if (Auth.loggedIn()) {
-                console.log('updating movie preferences')
-                // update movie preferences
-                dispatch({
-                    type: UPDATE_MOVIE_PREFERENCES,
-                    likedMovies: data.me.likedMovies,
-                    dislikedMovies: data.me.dislikedMovies
-                })
-
-                data.me.dislikedMovies.forEach((movie) => {
-                    idbPromise('dislikedMovies', 'put', movie);
-                    idbPromise('likedMovies', 'delete', movie);
-                });
-        
-                data.me.likedMovies.forEach((movie) => {
-                    idbPromise('dislikedMovies', 'delete', movie);
-                    idbPromise('likedMovies', 'put', movie);
-                });
+        // if we're online, use server to update movie preferences
+        if (!likedMovies.length && !dislikedMovies.length) {
+            if (data && data.me) {
+                if (data.me.likedMovies.length || !data.me.dislikedMovies.length) {
+                    console.log("Online, using data from server to update movie preferences")
+                    dispatch({
+                        type: UPDATE_MOVIE_PREFERENCES,
+                        likedMovies: data.me.likedMovies,
+                        dislikedMovies: data.me.dislikedMovies
+                    });
+                }
             }
-
-            console.log('pinging TMDB API to get trending movies')
-            // get the movies to display
-            getTrendingMovies('week').then(res => {
-                if (res.ok) {
-                    res.json().then(async ({ results }) => {
-                        // clean the data to match our MovieSchema
-                        const cleanedMovieData = await cleanMovieData(results);
-                        cleanedMovieData.forEach(async movie => {
-                            // add the movie to the db
-                            const result = await addMovie({ variables: { input: movie } })
-
-                            if (addMovieError) {
-                                throw new Error("Couldn't add movie");
-                            }
-
-                            const { data: newMovieData } = await result;
-                            const { addMovie : newMovie } = await newMovieData;
-
-                            // update state.movies
+            // if we're offline, use idb to update movie preferences
+            else if (!loading) {
+                idbPromise('likedMovies', 'get').then(likedMovies => {
+                    idbPromise('dislikedMovies', 'get').then(dislikedMovies => {
+                        if (dislikedMovies.length || likedMovies.length) {
+                            console.log("Offline, using data from idb to update movie preferences")
                             dispatch({
-                                type: ADD_TO_MOVIES,
-                                movie: newMovie
+                                type: UPDATE_MOVIE_PREFERENCES,
+                                likedMovies,
+                                dislikedMovies
                             })
+                        }
+                    })
+                })
+            }
+        }
+    }, [data, loading, likedMovies, dislikedMovies, dispatch])
 
-                            // add to idb
-                            idbPromise('movies', 'put', newMovie);
-                        })
-                    })
+    // hook for displaying a movie
+    useEffect(() => {
+        if (movies.length && movieIndex === '') {// show the next movie
+            console.log('There are movies, but no movieIndex. Setting movieIndex')
+            for (let i=0; i < movies.length; i++) {
+                const isLiked = likedMovies.some(likedMovie => likedMovie._id === movies[i]._id);
+                const isDisliked = dislikedMovies.some(dislikedMovie => dislikedMovie._id === movies[i]._id);
+
+                if (!isLiked && !isDisliked) {
+                    setMovieIndex(i);
+                    break;
                 }
-                else {
-                    throw new Error ("Couldn't load trending movies");
-                }
-            })
+            }
         }
-        // get cache from idb
-        else if (!loading) {
-            idbPromise('movies', 'get').then(movies => {
-                dispatch({
-                    type: UPDATE_MOVIES,
-                    movies
+    }, [setMovieIndex, dislikedMovies, likedMovies, movies, movieIndex]);
+
+    // hook for getting the movies
+    useEffect(() => {
+        if (!movies.length) {
+            // if we're online, ping the API to get our movie preferences
+            if (data) {
+                console.log("Online, Pinging TMDB API to get trending movies");
+                getTrendingMovies('week').then(res => {
+                    if (res.ok) {
+                        res.json().then(async ({ results }) => {
+                            // clean the data to match our MovieSchema
+                            const cleanedMovieData = await cleanMovieData(results);
+                            cleanedMovieData.forEach(async movie => {
+                                // add the movie to the db
+                                const result = await addMovie({ variables: { input: movie } })
+
+                                if (addMovieError) {
+                                    throw new Error("Couldn't add movie");
+                                }
+
+                                const { data: newMovieData } = await result;
+                                const { addMovie : newMovie } = await newMovieData;
+
+                                // add the movie to the global store
+                                dispatch({
+                                    type: ADD_TO_MOVIES,
+                                    movie: newMovie
+                                })
+
+                                // add to idb
+                                idbPromise('movies', 'put', newMovie);
+                            })
+                        })
+                    }
+                    else {
+                        throw new Error ("Couldn't load trending movies");
+                    }
                 })
-                idbPromise('dislikedMovies', 'get').then(dislikedMovies => {
-                    idbPromise('likedMovies', 'get').then(likedMovies => {
+            }
+            // if we're offline, use idb to update movie preferences
+            else if (!loading) {
+                console.log("Offline")
+                idbPromise('movies', 'get').then(movies => {
+                    if (movies.length) {
+                        console.log('Using IDB to get trending movies');
                         dispatch({
-                            type: UPDATE_MOVIE_PREFERENCES,
-                            likedMovies,
-                            dislikedMovies
+                            type: UPDATE_MOVIES,
+                            movies
                         })
-                    })
+                    }
                 })
-            })
+            }
         }
-    }, [movies, data, loading, likedMovies, dislikedMovies, addMovie, addMovieError, dispatch])
+    }, [movies, data, dispatch, loading, addMovie, addMovieError])
 
     const handleLikeMovie = (likedMovie) => {
         // update the db
@@ -139,6 +152,8 @@ const Homepage = () => {
                 idbPromise('likedMovies', 'put', likedMovie);
                 idbPromise('dislikedMovies', 'delete', likedMovie);
 
+                // skip to the next movie
+                handleSkipMovie();
             } else {
                 console.error("Couldn't like the movie!");
             }
@@ -162,6 +177,9 @@ const Homepage = () => {
                 // update idb
                 idbPromise('likedMovies', 'delete', dislikedMovie);
                 idbPromise('dislikedMovies', 'put', dislikedMovie);
+
+                // skip to the next movie
+                handleSkipMovie();
             } else {
                 console.error("Couldn't dislike the movie!");
             }
@@ -169,17 +187,23 @@ const Homepage = () => {
         .catch(err => console.error(err));
     };
 
+
     const handleSkipMovie = async () => {
         // put the current movie at the end of the array if it's not the only movie
-        if (movies.length > 1) {
-            const currentMovie = await moviesToDisplay[0];
-            const updatedMovies = await moviesToDisplay.slice(1,);
-            updatedMovies.push(currentMovie);
-            setMoviesToDisplay(updatedMovies)
+        if (movies.length) {
+            for (let i=movieIndex + 1; i < movies.length; i++) {
+                const isLiked = likedMovies.some(likedMovie => likedMovie._id === movies[i]._id);
+                const isDisliked = dislikedMovies.some(dislikedMovie => dislikedMovie._id === movies[i]._id);
+
+                if (!isLiked && !isDisliked) {
+                    setMovieIndex(i);
+                    break;
+                }
+            }
         }
         // if this is the only movie left, set moviesToDisplay to an empty array.
         else {
-            setMoviesToDisplay([]);
+            setMovieIndex('')
         }
     }
     
@@ -197,9 +221,9 @@ const Homepage = () => {
 
             <Container>
                 {loading ? <h2>Loading....</h2> : null}
-                {moviesToDisplay.length
+                {movies.length
                 ?   <MovieCard
-                        movie={moviesToDisplay[0]}
+                        movie={movies[movieIndex]}
                         displayTrailer
                         displaySkip
                         likeMovieHandler={handleLikeMovie}
