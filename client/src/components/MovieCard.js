@@ -68,7 +68,7 @@ const MovieCard = (props) => {
                     </Card.Title>
                     <Row>
                         <Col sm={6}>
-                            { movie.rating
+                            { movie.rating >= 0
                             ?   <StarRatings
                                     rating={movie.rating/2}
                                     numberOfStars={5}
