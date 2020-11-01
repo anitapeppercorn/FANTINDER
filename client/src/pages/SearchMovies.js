@@ -22,7 +22,7 @@ import { idbPromise } from "../utils/helpers";
 const SearchMovies = () => {
     // State
     const [state, dispatch] = useFantinderContext();
-    const { movies } = state;
+    const { likedMovies, dislikedMovies } = state
     const [resultsFound, setResultsFound] = useState(true);
     const [searchInput, setSearchInput] = useState('');
     const [searchedMovies, setSearchedMovies] = useState([]);
@@ -33,39 +33,37 @@ const SearchMovies = () => {
     const [likeMovie] = useMutation(LIKE_MOVIE);
     const { loading, data } = useQuery(GET_USER);
 
-    // get the movie preferences for the current user to handle like/dislike functionality
+    // hook for updating movie preferences
     useEffect(() => {
-        // retrieved from server if movies aren't already in global store
-        if (data && !(movies.length)) {
-            dispatch({
-                type: UPDATE_MOVIE_PREFERENCES,
-                likedMovies: data.me.likedMovies,
-                dislikedMovies: data.me.dislikedMovies
-            })
-
-            data.me.dislikedMovies.forEach((movie) => {
-                idbPromise('dislikedMovies', 'put', movie);
-                idbPromise('likedMovies', 'delete', movie);
-            });
-    
-            data.me.likedMovies.forEach((movie) => {
-                idbPromise('dislikedMovies', 'delete', movie);
-                idbPromise('likedMovies', 'put', movie);
-            });
-        }
-        // get cache from idb
-        else if (!loading) {
-            idbPromise('dislikedMovies', 'get').then(dislikedMovies => {
-                idbPromise('likedMovies', 'get').then(likedMovies => {
+        // if we're online, use server to update movie preferences
+        if (!likedMovies.length && !dislikedMovies.length) {
+            if (data && data.me) {
+                if (data.me.likedMovies.length || !data.me.dislikedMovies.length) {
+                    console.log("Online, using data from server to update movie preferences")
                     dispatch({
                         type: UPDATE_MOVIE_PREFERENCES,
-                        likedMovies: likedMovies,
-                        dislikedMovies: dislikedMovies
+                        likedMovies: data.me.likedMovies,
+                        dislikedMovies: data.me.dislikedMovies
+                    });
+                }
+            }
+            // if we're offline, use idb to update movie preferences
+            else if (!loading) {
+                idbPromise('likedMovies', 'get').then(likedMovies => {
+                    idbPromise('dislikedMovies', 'get').then(dislikedMovies => {
+                        if (dislikedMovies.length || likedMovies.length) {
+                            console.log("Offline, using data from idb to update movie preferences")
+                            dispatch({
+                                type: UPDATE_MOVIE_PREFERENCES,
+                                likedMovies,
+                                dislikedMovies
+                            })
+                        }
                     })
                 })
-            })
+            }
         }
-    }, [data, loading, dispatch, movies.length]);
+    }, [data, loading, likedMovies, dislikedMovies, dispatch])
 
     const handleFormSubmit = async (event) => {
         event.preventDefault();
