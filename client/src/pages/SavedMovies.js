@@ -19,36 +19,42 @@ import { idbPromise } from "../utils/helpers";
 const SavedMovies = () => {
     // State
     const [state, dispatch] = useFantinderContext();
-    const { likedMovies } = state;
+    const { likedMovies, dislikedMovies } = state;
     // GraphQL
     const [dislikeMovie] = useMutation(DISLIKE_MOVIE);
     const [likeMovie] = useMutation(LIKE_MOVIE);
     const { loading, data } = useQuery(GET_USER);
 
     useEffect(() => {
-        // if we're online, use sever to update movie preferences
-        if (data && data.me && !likedMovies.length) {
-            console.log("Online, using data from server to update movie preferences")
-            dispatch({
-                type: UPDATE_MOVIE_PREFERENCES,
-                likedMovies: data.me.likedMovies,
-                dislikedMovies: data.me.dislikedMovies
-            });
-        }
-        // if we're offline, use idb to update movie preferences
-        else if (!loading && !likedMovies.length) {
-            console.log("Offline, using data from idb to update movie preferences")
-            idbPromise('likedMovies', 'get').then(likedMovies => {
-                idbPromise('dislikedMovies', 'get').then(dislikedMovies => {
+        // if we're online, use server to update movie preferences
+        if (!likedMovies.length && !dislikedMovies.length) {
+            if (data && data.me) {
+                if (data.me.likedMovies.length || !data.me.dislikedMovies.length) {
+                    console.log("Online, using data from server to update movie preferences")
                     dispatch({
                         type: UPDATE_MOVIE_PREFERENCES,
-                        likedMovies,
-                        dislikedMovies
+                        likedMovies: data.me.likedMovies,
+                        dislikedMovies: data.me.dislikedMovies
+                    });
+                }
+            }
+            // if we're offline, use idb to update movie preferences
+            else if (!loading) {
+                idbPromise('likedMovies', 'get').then(likedMovies => {
+                    idbPromise('dislikedMovies', 'get').then(dislikedMovies => {
+                        if (dislikedMovies.length || likedMovies.length) {
+                            console.log("Offline, using data from idb to update movie preferences")
+                            dispatch({
+                                type: UPDATE_MOVIE_PREFERENCES,
+                                likedMovies,
+                                dislikedMovies
+                            })
+                        }
                     })
                 })
-            })
+            }
         }
-    })
+    }, [data, loading, likedMovies, dislikedMovies, dispatch])
     
     const handleLikeMovie = (likedMovie) => {
         // update the db
