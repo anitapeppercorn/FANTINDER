@@ -34,12 +34,12 @@ const MovieCard = (props) => {
         return (
             <Button
                 variant="link"
-                className={`small link ${isCurrentEventKey ? 'text-muted' : '' }`}
+                className={`link ${isCurrentEventKey ? 'text-muted' : '' }`}
                 onClick={decoratedOnClick}
             >
                 {isCurrentEventKey
-                ?   <span>Collapse <i className="fas fa-chevron-up"></i></span>
-                :   <span>Click for details <i className="fas fa-chevron-down"></i></span>
+                ?   <span className="small">Collapse <i className="fas fa-chevron-up"></i></span>
+                :   <span className="small">Click for details <i className="fas fa-chevron-down"></i></span>
                 }
             </Button>
         );

@@ -20,7 +20,7 @@ const SavedMovies = () => {
     // State
     const [state, dispatch] = useFantinderContext();
     const { likedMovies, movies } = state;
-    const [moviesToDisplay, setMoviesToDisplay] = useState([]);
+    const [moviesToDisplay, setMoviesToDisplay] = useState('');
     // GraphQL
     const [dislikeMovie] = useMutation(DISLIKE_MOVIE);
     const [likeMovie] = useMutation(LIKE_MOVIE);
@@ -28,11 +28,14 @@ const SavedMovies = () => {
 
     useEffect(() => {
         // movies are already in global store
-        if (likedMovies.length) {
-            setMoviesToDisplay(likedMovies);
+        if (likedMovies.length >= 0 ) {
+            console.log('setting movies to likedMovies in global store')
+            setMoviesToDisplay(state.likedMovies);
+            console.log(moviesToDisplay)
         } 
         // retrieved from server
-        else if (data) {
+        else if (data && data.me) {
+            console.log('updating movie prefs based on db')
             dispatch({
                 type: UPDATE_MOVIE_PREFERENCES,
                 likedMovies: data.me.likedMovies,
@@ -122,14 +125,15 @@ const SavedMovies = () => {
                 <h2 className="pb-5">
                     {loading
                         ?   null
-                        :   moviesToDisplay?.length > 0 
-                                ? `Displaying ${moviesToDisplay.length} saved ${moviesToDisplay.length === 1 ? "movie" : "movies"}.`
+                        :   likedMovies?.length > 0 
+                                ? `Displaying ${likedMovies.length} saved ${likedMovies.length === 1 ? "movie" : "movies"}.`
                                 : "You have no saved movies!"   
                     }
                     
                 </h2>
                 <CardColumns>
-                    {moviesToDisplay?.map(movie => {
+                    {likedMovies?.length
+                    ? likedMovies.map(movie => {
                         return (
                             <MovieCard
                                 key={movie._id}
@@ -138,8 +142,8 @@ const SavedMovies = () => {
                                 likeMovieHandler={handleLikeMovie}
                                 dislikeMovieHandler={handleDislikeMovie}
                             />
-                        )
-                    })}
+                        )})
+                    : null}
                 </CardColumns>
             </Container>
         </>
