@@ -20,12 +20,12 @@ export const reducer = (state, action) => {
             return {
                 ...state,
                 likedMovies: [...state.likedMovies, action.movie],
-                dislikedMovies: state.dislikedMovies.filter(dislikedMovie => dislikedMovie._id !== action.movie._id),
+                dislikedMovies: state.dislikedMovies.length === 1 ? [] : state.dislikedMovies.filter(dislikedMovie => dislikedMovie._id !== action.movie._id),
             }
         case ADD_TO_DISLIKED_MOVIES:
             return {
                 ...state,
-                likedMovies: state.likedMovies.filter(likedMovie => likedMovie._id !== action.movie._id),
+                likedMovies: state.likedMovies.length === 1 ? [] : state.likedMovies.filter(likedMovie => likedMovie._id !== action.movie._id),
                 dislikedMovies: [...state.dislikedMovies, action.movie],
             }
         case UPDATE_MOVIES:
