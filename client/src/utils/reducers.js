@@ -17,12 +17,14 @@ export const reducer = (state, action) => {
                 movies: [...state.movies, action.movie]
             }
         case ADD_TO_LIKED_MOVIES:
+            console.log({ action })
             return {
                 ...state,
                 likedMovies: [...state.likedMovies, action.movie],
                 dislikedMovies: state.dislikedMovies.length === 1 ? [] : state.dislikedMovies.filter(dislikedMovie => dislikedMovie._id !== action.movie._id),
             }
         case ADD_TO_DISLIKED_MOVIES:
+            console.log({ action })
             return {
                 ...state,
                 likedMovies: state.likedMovies.length === 1 ? [] : state.likedMovies.filter(likedMovie => likedMovie._id !== action.movie._id),

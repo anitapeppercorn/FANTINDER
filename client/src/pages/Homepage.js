@@ -22,6 +22,7 @@ import { idbPromise } from "../utils/helpers";
 import { cleanMovieData } from '../utils/movieData';
 // Other Utils
 import Auth from '../utils/auth';
+import { findIndexByAttr } from '../utils/helpers'
 
 const Homepage = () => {
     const [state, dispatch] = useFantinderContext();
@@ -141,17 +142,20 @@ const Homepage = () => {
         likeMovie({
             variables: { movieId: likedMovie._id }
         })
-        .then(data => {
+        .then( async ({data}) => {
             if (data) {
                 // update global state
                 dispatch({
                     type: ADD_TO_LIKED_MOVIES,
-                    movie: likedMovie
+                    movie: data.likeMovie
                 });
     
-                // update idb
-                idbPromise('likedMovies', 'put', likedMovie);
-                idbPromise('dislikedMovies', 'delete', likedMovie);
+                // find the updated movie
+                const likedMovieIndex = await findIndexByAttr(data.likeMovie.likedMovies, '_id', likedMovie._id);
+                const updatedLikedMovie = data.likeMovie.likedMovies[likedMovieIndex];
+
+                idbPromise('likedMovies', 'put', updatedLikedMovie);
+                idbPromise('dislikedMovies', 'delete', updatedLikedMovie);
 
                 // skip to the next movie
                 handleSkipMovie();
@@ -167,17 +171,21 @@ const Homepage = () => {
         dislikeMovie({
             variables: { movieId: dislikedMovie._id }
         })
-        .then(data => {
+        .then(async ({data}) => {
             if (data) {
                 // update global state
                 dispatch({
                     type: ADD_TO_DISLIKED_MOVIES,
-                    movie: dislikedMovie
+                    movie: data.dislikeMovie
                 });
     
+                // find the updated movie
+                const dislikedMovieIndex = await findIndexByAttr(data.dislikeMovie.dislikedMovies, '_id', dislikedMovie._id);
+                const updatedDislikedMovie = data.dislikeMovie.dislikedMovies[dislikedMovieIndex];
+    
                 // update idb
-                idbPromise('likedMovies', 'delete', dislikedMovie);
-                idbPromise('dislikedMovies', 'put', dislikedMovie);
+                idbPromise('likedMovies', 'delete', updatedDislikedMovie);
+                idbPromise('dislikedMovies', 'put', updatedDislikedMovie);
 
                 // skip to the next movie
                 handleSkipMovie();
