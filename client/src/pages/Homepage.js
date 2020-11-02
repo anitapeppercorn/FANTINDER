@@ -10,13 +10,7 @@ import { GET_USER } from '../utils/queries';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 // Global State
 import { useFantinderContext } from "../utils/GlobalState";
-import {
-    ADD_TO_MOVIES,
-    ADD_TO_DISLIKED_MOVIES,
-    ADD_TO_LIKED_MOVIES,
-    UPDATE_MOVIE_PREFERENCES,
-    UPDATE_MOVIES
-} from '../utils/actions';
+import { ADD_TO_MOVIES, UPDATE_MOVIE_PREFERENCES, UPDATE_MOVIES } from '../utils/actions';
 // IndexedDB
 import { idbPromise } from "../utils/helpers";
 import { cleanMovieData } from '../utils/movieData';
@@ -70,14 +64,21 @@ const Homepage = () => {
     useEffect(() => {
         if (movies.length && movieIndex === '') {// show the next movie
             console.log('There are movies, but no movieIndex. Setting movieIndex')
-            for (let i=0; i < movies.length; i++) {
-                const isLiked = likedMovies.some(likedMovie => likedMovie._id === movies[i]._id);
-                const isDisliked = dislikedMovies.some(dislikedMovie => dislikedMovie._id === movies[i]._id);
+            // if they're logged in, set it to the first movie they haven't actioned
+            if (Auth.loggedIn()){
+                for (let i=0; i < movies.length; i++) {
+                    const isLiked = likedMovies.some(likedMovie => likedMovie._id === movies[i]._id);
+                    const isDisliked = dislikedMovies.some(dislikedMovie => dislikedMovie._id === movies[i]._id);
 
-                if (!isLiked && !isDisliked && movies[i].trailer) {
-                    setMovieIndex(i);
-                    break;
+                    if (!isLiked && !isDisliked && movies[i].trailer) {
+                        setMovieIndex(i);
+                        break;
+                    }
                 }
+            }
+            // if they're logged in, set it to the first movie in the deck
+            else {
+                setMovieIndex(0);
             }
         }
     }, [setMovieIndex, dislikedMovies, likedMovies, movies, movieIndex]);
@@ -142,18 +143,21 @@ const Homepage = () => {
         likeMovie({
             variables: { movieId: likedMovie._id }
         })
-        .then( async ({data}) => {
+        .then(({data}) => {
+            console.log(data.likeMovie)
             if (data) {
                 // update global state
                 dispatch({
-                    type: ADD_TO_LIKED_MOVIES,
-                    movie: data.likeMovie
+                    type: UPDATE_MOVIE_PREFERENCES,
+                    likedMovies: data.likeMovie.likedMovies,
+                    dislikedMovies: data.likeMovie.dislikedMovies
                 });
     
                 // find the updated movie
-                const likedMovieIndex = await findIndexByAttr(data.likeMovie.likedMovies, '_id', likedMovie._id);
+                const likedMovieIndex = findIndexByAttr(data.likeMovie.likedMovies, '_id', likedMovie._id);
                 const updatedLikedMovie = data.likeMovie.likedMovies[likedMovieIndex];
 
+                // update idb
                 idbPromise('likedMovies', 'put', updatedLikedMovie);
                 idbPromise('dislikedMovies', 'delete', updatedLikedMovie);
 
@@ -175,8 +179,9 @@ const Homepage = () => {
             if (data) {
                 // update global state
                 dispatch({
-                    type: ADD_TO_DISLIKED_MOVIES,
-                    movie: data.dislikeMovie
+                    type: UPDATE_MOVIE_PREFERENCES,
+                    likedMovies: data.dislikeMovie.likedMovies,
+                    dislikedMovies: data.dislikeMovie.dislikedMovies
                 });
     
                 // find the updated movie
